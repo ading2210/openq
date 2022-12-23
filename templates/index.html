@@ -7,14 +7,15 @@
 {% endblock %}
 
 {% block content %}
-<p>OpenQ</p>
-<h3>Login</h3>
-<br>
-<form id="login_form" name="login_form">
-  <label for="username_input">Student ID:</label><br>
-  <input type="text" id="username_input" name="username_input" placeholder="00000" autocomplete="username"><br><br>
-  <label for="password_input">Password:</label><br>
-  <input type="password" id="password_input" name="password_input" placeholder="********" autocomplete="current-password"><br><br>
-  <input type="submit" name="submit" id="submit" value="Sign In"/>
-</form>
+<div class="mx-auto w-fit article_box">
+  <img class="h-24" src="/assets/title.svg">
+  <h3 class="text-center text-xl mb-3">Login</h3>
+  <form id="login_form" name="login_form">
+    <label for="username_input">Student ID:</label><br>
+    <input class="text_input mb-6" type="text" id="username_input" name="username_input" placeholder="00000" autocomplete="username"><br>
+    <label for="password_input">Password:</label><br>
+    <input class="text_input mb-6" type="password" id="password_input" name="password_input" placeholder="********" autocomplete="current-password"><br>
+    <input class="w-full bg-custom_accent_1 text-white rounded p-1" type="submit" name="submit" id="submit" value="Sign In"/>
+  </form>
+</div>
 {% endblock %}

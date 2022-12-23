@@ -1,6 +1,6 @@
 import * as api from "/js/api.js"
 
-api.set_q_endpoint("https://sis.pleasantonusd.net/StudentPortal");
+api.retrieve_default_endpoint(true);
 
 var password_input, username_input, login_form;
 

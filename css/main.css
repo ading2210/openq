@@ -1,0 +1,43 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400&display=swap');
+
+
+@layer components { 
+  .navbar_button {
+    @apply 
+    text-custom_text
+  }
+  .navbar_text {
+    @apply 
+    text-custom_text
+    hover:text-white
+  }
+  .article_box {
+    @apply
+    bg-custom_bg_light 
+    rounded-lg 
+    drop-shadow-md 
+    ring-1 
+    ring-custom_bg_alt
+    mt-8
+    p-5 
+  }
+  .text_input {
+    @apply
+    w-full
+    p-2
+    
+    rounded
+    text-base
+    bg-custom_bg_regular
+    
+    caret-custom_accent_1
+    ring-1
+    ring-custom_bg_alt
+    focus:outline-none
+    focus:ring-custom_accent_1
+    focus:ring-2
+  }
+}

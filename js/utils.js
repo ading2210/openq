@@ -21,8 +21,23 @@ export function http_get(url, callback, args={}) {
   const defaults = {headers: [], method: "GET", payload: null};
   merge_args(defaults, args);
   
+  //handle errors
+  let actual_callback = function() {
+    if ((this.status+"")[0] != 2) {
+      let data = JSON.parse(this.responseText);
+      console.warn(`Request to "${url}" failed with status ${this.status}.`);
+      console.warn(`${data.error}: ${data.message}`)
+      if (typeof data.traceback != "undefined") {
+        console.warn(data.traceback);
+      }
+    }
+    else {
+      callback(this)
+    }
+  }
+  
   //stringify payload
-  var payload = args.payload;
+  let payload = args.payload;
   if (payload != null) {
     payload = JSON.stringify(args.payload);
     args.headers["content-type"] = "application/json";
@@ -30,11 +45,11 @@ export function http_get(url, callback, args={}) {
   
   //initiate request
   let request = new XMLHttpRequest();
-  request.addEventListener("load", callback);
+  request.addEventListener("load", actual_callback);
   request.open(args.method, url, true);
   
   //parse headers
-  let keys = Object.keys(args.headers)
+  let keys = Object.keys(args.headers);
   for (let key of keys) {
     request.setRequestHeader(key, args.headers[key]);
   }

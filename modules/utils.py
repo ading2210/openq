@@ -1,10 +1,45 @@
-import base64, json, binascii, traceback, logging
+import base64, json, binascii, traceback, logging, os
 from modules import exceptions
+from urllib.parse import urlparse
 
-def load_config(base_path):
-  pass
+config = {}
+exception_dict = {
+  "BadRequestError": 400,
+  "UnauthorizedError": 401,
+  "ForbiddenError": 403
+}
 
-#generate a flask response from data
+#load config files
+def load_config(config_path):
+  global config
+  
+  defaults_file = config_path / "defaults.json"
+  config_file = config_path / "config.json"
+  overwrite_config = False
+  
+  with open(defaults_file) as f:
+    defaults = json.loads(f.read())
+  
+  if defaults_file.exists():
+    try:
+      with open(config_file) as f:
+        config = json.loads(f.read())
+    except json.decoder.JSONDecodeError:
+      pass
+  
+  for key in defaults:
+    if not key in config:
+      config[key] = defaults[key]
+
+  with open(config_file, "w") as f:
+    f.write(json.dumps(config, indent=2))
+
+#check if url is valid or not
+def validate_url(url):
+  result = urlparse(url)
+  return all([result.scheme, result.netloc, result.path])
+
+#generate a flask response from json data
 def generate_response(data, status=200):
   response = {
     "status": status,
@@ -13,13 +48,9 @@ def generate_response(data, status=200):
   return response, status
 
 #convert an exception into a flask response
-def handle_exception(exception, debug=False):
-  exception_dict = {
-    "TypeError": 400,
-    "KeyError": 400,
-    "UnauthorizedError": 401,
-    "ForbiddenError": 403
-  }
+def handle_exception(exception, debug=None):
+  if debug == None:
+    debug = config.get("debug")
   
   if isinstance(exception, Exception):
     message = str(exception)
@@ -53,22 +84,36 @@ def process_header(request):
     try:
       data = json.loads(base64.b64decode(header))
     except (json.decoder.JSONDecodeError, binascii.Error) as e: 
-      raise TypeError("Invaid auth header data.")
-    
-    if "endpoint" in data:
-      for key in data:
-        if not key in ["endpoint", "session", "username", "password"]:
-          del data[key]
+      raise exceptions.BadRequestError("Invaid auth header data.")
       
-      if "session" in data:
-        return data
-      elif "username" in data and "password" in data:
-        return data
-      else:
-        raise exceptions.UnauthorizedError("Session or login missing.")
-
+    if "endpoint" in data and "session" in data:
+      returned = {
+        "endpoint": data["endpoint"],
+        "session": data["session"]
+      }
+      return returned
     else:
-      raise KeyError("Endpoint url missing.")
+      raise exceptions.BadRequestError("Endpoint url missing.")
       
   else:
     raise exceptions.UnauthorizedError("Auth header missing.")
+
+#validate headers
+def validate_headers(request):
+  auth = process_header(request)
+
+  if not validate_url(auth["endpoint"]):
+    raise exceptions.BadRequestError("Endpoint needs to be a valid URL.")
+
+  return auth
+
+#extract headers and auth data from a flask request
+def extract_data(request):
+  auth = validate_headers(request)
+  
+  headers = {}
+  if request.headers.get("user-agent"):
+    headers["user-agent"] = request.headers["user-agent"]
+  headers["cookie"] = "ASP.NET_SessionId=" + auth["session"]
+  
+  return auth, headers
