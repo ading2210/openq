@@ -3,6 +3,10 @@
 @import "tailwindcss/utilities";
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400&display=swap');
 
+input[type="password"] {
+  font-family: arial;
+	letter-spacing: 3px;
+}
 
 @layer components { 
   .navbar_button {

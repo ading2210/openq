@@ -6,7 +6,9 @@ export var q_endpoint = "";
 export var session = "";
 export const api_endpoints = {
   default_endpoint: "/api/default_endpoint",
-  login: "/api/login"
+  login: "/api/login",
+  students: "/api/students",
+  assignments: "/api/assignments"
 };
 
 export function set_q_endpoint(new_endpoint) {
@@ -34,11 +36,21 @@ export function encode_headers(overrides={}){
   return {"authorization": btoa(JSON.stringify(payload))};
 }
 
-export function login(username, password, callback) {
+export function login(username, password, callback=function(){}) {
   let url = api_endpoints.login;
   let payload = {
     username: username,
     password: password
   };
   utils.http_get(url, callback, {method: "POST", payload: payload, headers: encode_headers()});
+}
+
+export function get_students(callback) {
+  let url = api_endpoints.students;
+  utils.http_get(url, callback, {headers: encode_headers()})
+}
+
+export function get_assignments(callback) {
+  let url = api_endpoints.students;
+  utils.http_get(url, callback, {headers: encode_headers()})
 }

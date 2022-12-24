@@ -12,11 +12,21 @@ function toggle_visibility() {
   }
 }
 
+function login_callback(r) {
+  let data = JSON.parse(r.responseText);
+  if ((r.status+"")[0] != 2) {
+    
+  }
+  else {
+    
+  }
+}
+
 function submit_login(){
   let password = password_input.value;
   let username = username_input.value;
   
-  api.login(username, password, function(){});
+  api.login(username, password, login_callback)
   
   return false;
 }

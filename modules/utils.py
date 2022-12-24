@@ -40,11 +40,14 @@ def validate_url(url):
   return all([result.scheme, result.netloc, result.path])
 
 #generate a flask response from json data
-def generate_response(data, status=200):
+def generate_response(data, session=None, status=200):
   response = {
     "status": status,
-    "data": data
+    "data": data,
   }
+  if session != None:
+    response["session"] = session
+    
   return response, status
 
 #convert an exception into a flask response
@@ -114,6 +117,5 @@ def extract_data(request):
   headers = {}
   if request.headers.get("user-agent"):
     headers["user-agent"] = request.headers["user-agent"]
-  headers["cookie"] = "ASP.NET_SessionId=" + auth["session"]
-  
+
   return auth, headers

@@ -1,9 +1,10 @@
 from flask import Flask, render_template, send_from_directory, request
-from modules import api, utils, exceptions
+from modules import api, utils, exceptions, datatypes
 import pathlib
 import logging
 
 app = Flask(__name__)
+app.json_encoder = datatypes.CustomJSONEncoder
 
 #===== load config =====
 base_path = pathlib.Path(__file__).parent.resolve()
@@ -36,18 +37,23 @@ def login():
     if data["password"] == "":
       raise exceptions.BadRequestError("Password cannot be empty.")
     
-    sessionId = api.login(auth["endpoint"], data["username"], data["password"], headers=headers)
-    response = {"session": sessionId}
-    return utils.generate_response(response)
+    session = api.login(auth["endpoint"], data["username"], data["password"], headers=headers)
+    response = {"success": True}
+    return utils.generate_response(response, session)
   
   except Exception as e:
     return utils.handle_exception(e)
     
-@app.route("/api/assignments", methods=["GET"])
-def get_assignments():
+@app.route("/api/students")
+def get_students():
   try:
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
+    
+    response = {
+      "students": api.get_students(endpoint, auth["session"], headers=headers)
+    }
+    return utils.generate_response(response)
     
   except Exception as e:
     return utils.handle_exception(e)

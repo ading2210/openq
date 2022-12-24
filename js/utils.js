@@ -1,3 +1,5 @@
+import * as api from "/js/api.js"
+
 export function merge_args(defaults, args) {
   let keys = Object.keys(defaults);
   for (let i=0; i<keys.length; i++) {
@@ -23,17 +25,19 @@ export function http_get(url, callback, args={}) {
   
   //handle errors
   let actual_callback = function() {
+    let data = JSON.parse(this.responseText);
+    
     if ((this.status+"")[0] != 2) {
-      let data = JSON.parse(this.responseText);
       console.warn(`Request to "${url}" failed with status ${this.status}.`);
       console.warn(`${data.error}: ${data.message}`)
       if (typeof data.traceback != "undefined") {
         console.warn(data.traceback);
       }
     }
-    else {
-      callback(this)
+    if (typeof data.session != "undefined") {
+      api.set_session(data.session);
     }
+    callback(this);
   }
   
   //stringify payload
