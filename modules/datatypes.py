@@ -102,16 +102,18 @@ class Student:
     "counselor": "Counselor"
   }
   
-  def __init__(self, id, attributes):
+  def __init__(self, id, **kwargs):
     self.id = id
     
-    for key in attributes:
+    for key in kwargs:
       if key in self.attributes:
-        setattr(self, key, attributes[key])
+        setattr(self, key, kwargs[key])
     for key in self.attributes:
       value = self.attributes[key]
-      if value in attributes:
-        setattr(self, key, attributes[value])
+      if value in kwargs:
+        setattr(self, key, kwargs[value])
+      else:
+        setattr(self, key, None)
         
   def encode_as_dict(self):
     student_dict = {}

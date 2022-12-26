@@ -8,6 +8,14 @@ input[type="password"] {
 	letter-spacing: 3px;
 }
 
+/* classes for setting svg colors */
+.normal {
+  filter: invert(0%)
+}
+.inverted {
+  filter: invert(100%)
+}
+
 @layer components { 
   .navbar_button {
     @apply 
@@ -25,7 +33,6 @@ input[type="password"] {
     drop-shadow-md 
     ring-1 
     ring-custom_bg_alt
-    mt-8
     p-5 
   }
   .text_input {
@@ -43,5 +50,20 @@ input[type="password"] {
     focus:outline-none
     focus:ring-custom_accent_1
     focus:ring-2
+  }
+  .sidebar_button {
+    @apply
+    p-2
+
+    rounded-lg
+    hover:bg-custom_bg_regular
+  }
+  .sidebar_button_selected {
+    @apply
+    p-2
+
+    rounded-lg
+    bg-custom_bg_light
+    drop-shadow-sm
   }
 }

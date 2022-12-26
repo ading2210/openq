@@ -10,22 +10,24 @@
     {% endblock %}
   </head>
   <body class="h-screen bg-custom_bg_regular text-custom_text">
-    <nav class="w-full bg-custom_bg_dark p-3 ring-1 ring-custom_bg_light">
-      <div class="flex flex items-center justify-between max-w-7xl mx-auto">
-        <a href="/">
-          <img class="h-9" src="/assets/title.svg">
-        </a>
-        <ul class="flex gap-6">
-          <li>
-            <a href="/about" class="navbar_text">About</a>
-          </li>
-          <li>
-            <a href="/" class="navbar_text">Source Code</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    {% block content %}
-    {% endblock %}
+    <div class="min-h-screen flex flex-col">
+      <nav class="w-full bg-custom_bg_dark p-3 pr-6 ring-1 ring-custom_bg_light">
+        <div class="flex flex items-center justify-between mx-auto">
+          <a href="/">
+            <img class="h-9" src="/assets/title.svg">
+          </a>
+          <ul class="flex gap-6">
+            <li>
+              <a href="/about" class="navbar_text">About</a>
+            </li>
+            <li>
+              <a href="https://github.com/ading2210/openq" class="navbar_text">Source Code</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      {% block content %}
+      {% endblock %}
+    </div>
   </body>
 </html>

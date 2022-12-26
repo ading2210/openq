@@ -12,6 +12,12 @@ config_path = base_path / "config"
 utils.load_config(config_path)
 if utils.config["debug"]:
   print("Debug mode enabled. Stacktraces will be included in error responses.")
+
+#===== error pages =====
+
+@app.errorhandler(404)
+def hanle_404(e):
+  return render_template("404.html"), 404
   
 #===== api routes =====
 
@@ -63,6 +69,10 @@ def get_students():
 @app.route("/")
 def homepage():
   return render_template("index.html")
+
+@app.route("/assignments")
+def assignments():
+  return render_template("assignments.html")
   
 #===== assets and static files =====
 
@@ -77,6 +87,8 @@ def assets(path):
 @app.route("/css/<path:path>")
 def css(path):
   return send_from_directory("css", path)
+
+#===== start server =====
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0", port=5000, debug=utils.config["debug"])

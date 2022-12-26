@@ -15,7 +15,10 @@ module.exports = {
       custom_bg_regular: "#241e3a",
       custom_bg_dark: "#1d1830",
       custom_bg_alt: "#3a344e",
+      custom_bg_hover: "#342e49",
+      
       custom_text: "#d4d3da",
+      custom_text_dark: "#afaeb8",
       
       custom_accent_1: "#ae3e8f",
       custom_accent_2: "#8f0bdf",

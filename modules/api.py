@@ -30,9 +30,7 @@ def extract_session(cookie):
   session_regex_2 = r"LM_Aequitas=([^;^ ]+)"
   if cookie == None:
     raise exceptions.BadGatewayError("No cookie returned.")
-    
-  print(cookie)
-    
+
   matches_1 = re.findall(session_regex_1, cookie)
   if len(matches_1) == 0:
     raise exceptions.BadGatewayError("SessionId not present in resposne.")
@@ -81,6 +79,10 @@ def get_students(endpoint, session, headers={}):
 
   students = []
   for row in table.rows:
-    students.append(datatypes.Student(row.id, row.data))
+    students.append(datatypes.Student(row.id, **row.data))
   
   return students
+
+#set the current student so that other data can be fetched
+def set_current_student(endpoint, session, student_id):
+  pass
