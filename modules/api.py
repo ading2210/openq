@@ -5,7 +5,8 @@ import lxml.html
 q_endpoints = {
   "login": "/Home/Login",
   "assignments": "/Home/LoadProfileData/Assignments",
-  "main_page": "/Home/PortalMainPage"
+  "main_page": "/Home/PortalMainPage",
+  "set_student": "/StudentBanner/SetStudentBanner/{student_id}"
 }
 
 def debug_response(r):
@@ -22,9 +23,6 @@ def debug_response(r):
   }
   return response
 
-def parse_table(table):
-  pass
-  
 def extract_session(cookie):
   session_regex_1 = r"ASP\.NET_SessionId=([^;^ ]+)"
   session_regex_2 = r"LM_Aequitas=([^;^ ]+)"
@@ -61,7 +59,6 @@ def login(endpoint, username, password, headers={}):
   
   if data["valid"] == "1":
     return extract_session(r.headers.get("set-cookie"))
-    
   else:
     raise exceptions.ForbiddenError("Username/Password is invalid.")
 
@@ -84,5 +81,12 @@ def get_students(endpoint, session, headers={}):
   return students
 
 #set the current student so that other data can be fetched
-def set_current_student(endpoint, session, student_id):
-  pass
+def set_current_student(endpoint, session, student_id, headers={}):
+  url = endpoint + q_endpoints["set_student"].format(student_id=student_id)
+  headers["cookie"] = construct_cookie(session)
+  r = requests.get(url, headers=headers)
+  
+  if r.headers.get("set-cookie"):
+    return extract_session(r.headers.get("set-cookie"))
+  else:
+    raise exceptions.BadGatewayError("Could not set the current student.")

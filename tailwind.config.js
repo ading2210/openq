@@ -1,4 +1,4 @@
-/** @type {import('tailwindcss').Config} */
+/* @type {import('tailwindcss').Config} */
 const colors = require('tailwindcss/colors')
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
       custom_bg_hover: "#342e49",
       
       custom_text: "#d4d3da",
-      custom_text_dark: "#afaeb8",
+      custom_text_alt: "#afaeb8",
       
       custom_accent_1: "#ae3e8f",
       custom_accent_2: "#8f0bdf",
@@ -28,7 +28,9 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       gray: colors.gray,
+      red: colors.red,
       green: colors.green,
+      emerald: colors.emerald,
       purple: colors.purple,
       indigo: colors.indigo,
       yellow: colors.amber,

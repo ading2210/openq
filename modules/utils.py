@@ -6,7 +6,8 @@ config = {}
 exception_dict = {
   "BadRequestError": 400,
   "UnauthorizedError": 401,
-  "ForbiddenError": 403
+  "ForbiddenError": 403,
+  "BadGatewayError": 502
 }
 
 #load config files

@@ -49,7 +49,25 @@ def login():
   
   except Exception as e:
     return utils.handle_exception(e)
+
+@app.route("/api/validate_session", methods=["GET", "HEAD"])
+def validate_session():
+  try:
+    auth, headers = utils.extract_data(request)
+    endpoint = auth["endpoint"]
+    api.get_students(endpoint, auth["session"], headers=headers)
     
+    if request.method == "GET":
+      return utils.generate_response({"success": True})
+    else:
+      return "", 200, {"success": "true"}
+      
+  except Exception as e:
+    if request.method == "GET":
+      return utils.generate_response({"success": False})
+    else:
+      return "", 200, {"success": "false"}
+      
 @app.route("/api/students")
 def get_students():
   try:
@@ -60,6 +78,21 @@ def get_students():
       "students": api.get_students(endpoint, auth["session"], headers=headers)
     }
     return utils.generate_response(response)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+
+@app.route("/api/set_student/<student_id>")
+def set_student(student_id):
+  print(student_id)
+  try:
+    auth, headers = utils.extract_data(request)
+    endpoint = auth["endpoint"]
+    session = auth["session"]
+    
+    new_session = api.set_current_student(endpoint, session, student_id, headers=headers)
+    response = {"sucesss": True}
+    return utils.generate_response(response, session=new_session)
     
   except Exception as e:
     return utils.handle_exception(e)
