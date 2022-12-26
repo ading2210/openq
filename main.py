@@ -114,6 +114,17 @@ def get_student_image(student_id):
   except Exception as e:
     return utils.handle_exception(e)
 
+@app.route("/api/assignments")
+def get_asssignments():
+  try:
+    auth, headers = utils.extract_data(request)
+    endpoint = auth["endpoint"]
+    
+    return api.get_assignments(endpoint, auth["session"], headers=headers)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+
 #===== user-visible pages =====
 
 @app.route("/")

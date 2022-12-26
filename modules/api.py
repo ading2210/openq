@@ -6,7 +6,7 @@ q_endpoints = {
   "login": "/Home/Login",
   "assignments": "/Home/LoadProfileData/Assignments",
   "main_page": "/Home/PortalMainPage",
-  "set_student": "/StudentBanner/SetStudentBanner/{id}",
+  "set_student": "/StudentBanner/SetStudentBanner/{q_id}",
   "student_image": "/StudentBanner/ShowImage/{student_id}"
 }
 
@@ -90,15 +90,15 @@ def get_students(endpoint, session, headers={}):
   return students
 
 #set the current student so that other data can be fetched
-def set_current_student(endpoint, session, student_id, headers={}):
-  url = endpoint + q_endpoints["set_student"].format(id=student_id)
+def set_current_student(endpoint, session, q_id, headers={}):
+  url = endpoint + q_endpoints["set_student"].format(q_id=q_id)
   headers["cookie"] = construct_cookie(session)
-  r = requests.get(url, headers=headers)
-  
-  if r.status_code == 304:
+  r = requests.get(url, headers=headers, allow_redirects=False)
+
+  if r.status_code == 302:
     return True
   else:
-    raise exceptions.BadGatewayError("Could not set the current student.")
+    raise exceptions.BadGatewayError(f"Could not set the current student. Endpoint returned status code {r.status_code}.")
 
 #get a student's image
 def get_student_image(endpoint, session, student_id, headers={}):
@@ -106,9 +106,15 @@ def get_student_image(endpoint, session, student_id, headers={}):
   headers["cookie"] = construct_cookie(session)
   r = requests.get(url, headers=headers)
   
-  print(r.status_code)
-  
   if r.status_code == 200 and r.headers.get("content-type"):
     return r.content, r.headers.get("content-type")
   else:
     raise exceptions.BadGatewayError("Could not get the student image.")
+
+#get all assignments
+def get_assignments(endpoint, session, headers={}):
+  url = endpoint + q_endpoints["assignments"]
+  headers["cookie"] = construct_cookie(session)
+  r = requests.get(url, headers=headers)
+  
+  return r.text

@@ -89,6 +89,6 @@ export function set_student(student_id, callback) {
 }
 
 export function get_assignments(callback) {
-  let url = api_endpoints.students;
+  let url = api_endpoints.assignments;
   utils.http_get(url, callback, {headers: encode_headers()});
 }

@@ -4,4 +4,4 @@ An open source frontend for [Q Student Connection](https://www.myaequitas.com/pr
 
 This project is a work-in-progress.
 
-Icons credit: [Iconoir](https://iconoir.com/) ([license](https://github.com/ading2210/openq/blob/main/assets/icons_license.txt))
+Icons credit: [Iconoir](https://iconoir.com/) ([license](https://github.com/iconoir-icons/iconoir/blob/main/LICENSE))
