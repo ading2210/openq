@@ -2,7 +2,9 @@ import * as api from "/js/api.js"
 import * as utils from "/js/utils.js";
 
 export const elements_list = [
-  "selected_student_name", "selected_student_year", "selected_student_img"
+  "selected_student_name", "selected_student_year", "selected_student_img",
+  "selected_student", "menu_student_template", "students_menu",
+  "arrows_seperate", "arrows_union", "logout_button"
 ];
 export const elements = {};
 export var students = [];
@@ -22,6 +24,13 @@ function onload() {
     let element = document.getElementById(id);
     elements[id] = element;
   }
+  
+  elements.logout_button.addEventListener("click", function(){
+    api.logout();
+    console.log("Logged out. Redirecting...");
+    window.location.href = "/";
+  })
+  
   console.log("Loading students...")
   load_students();
 }
@@ -31,12 +40,58 @@ function load_students() {
     if (r.success) {
       students = r.json.data.students;
       display_student(students[0]);
+      populate_students_menu(students);
+      elements.selected_student.addEventListener("click", toggle_students_menu);
     }
     else {
       console.log("Stored session is not valid. Redirecting...");
-      window.setTimeout(function(){window.location.href = "/";}, 10000);
+      window.location.href = "/";
     }
   });
+}
+
+function populate_students_menu(students) {
+  for (let i=0; i<students.length; i++) {
+    let student = students[i];
+    let id_base = `menu_student_${i}`;
+    let student_button = elements.menu_student_template.cloneNode(true);
+    student_button.id = id_base;
+    student_button.style.display = "flex";
+    student_button.q_id = student.id;
+    
+    let student_name = student_button.querySelector("#menu_student_template_name");
+    student_name.id = id_base+"_name";
+    student_name.innerHTML = student.name;
+    
+    let student_year = student_button.querySelector("#menu_student_template_year");
+    student_year.id = id_base+"_year";
+    student_year.innerHTML = student.year;
+    
+    let student_img = student_button.querySelector("#menu_student_template_img");
+    student_year.id = id_base+"_img";
+    api.get_student_image(student.student_id, function(r){
+      if (r.success) {
+        student_img.src = r.json.data.b64;
+      }
+    });
+    
+    elements.students_menu.insertBefore(student_button, elements.students_menu.firstChild)
+  }
+}
+
+function toggle_students_menu() {
+  if (elements.students_menu.style.display == "flex") {
+    elements.students_menu.style.display = "none";
+    elements.arrows_seperate.style.display = "initial";
+    elements.arrows_union.style.display = "none";
+    elements.selected_student.className = "student_button";
+  }
+  else {
+    elements.students_menu.style.display = "flex";
+    elements.arrows_seperate.style.display = "none";
+    elements.arrows_union.style.display = "initial";
+    elements.selected_student.className += " student_button_menu_open";
+  }
 }
 
 function display_student(student) {
@@ -47,7 +102,7 @@ function display_student(student) {
     if (r.success) {
       elements.selected_student_img.src = r.json.data.b64;
     }
-  })
+  });
 }
 
 main();

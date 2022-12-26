@@ -89,9 +89,9 @@ def set_student(student_id):
     endpoint = auth["endpoint"]
     session = auth["session"]
     
-    new_session = api.set_current_student(endpoint, session, student_id, headers=headers)
+    api.set_current_student(endpoint, session, student_id, headers=headers)
     response = {"sucesss": True}
-    return utils.generate_response(response, session=new_session)
+    return utils.generate_response(response)
     
   except Exception as e:
     return utils.handle_exception(e)
@@ -103,6 +103,7 @@ def get_student_image(student_id):
     endpoint = auth["endpoint"]
     session = auth["session"]
     
+    #todo: don't use base64
     data, content_type = api.get_student_image(endpoint, session, student_id, headers=headers)
     b64_data = base64.b64encode(data).decode()
     b64_string = f"data:{content_type};base64,{b64_data}"

@@ -66,4 +66,20 @@ input[type="password"] {
     bg-custom_bg_light
     drop-shadow-sm
   }
+  .student_button {
+    @apply 
+    sidebar_button
+    flex 
+    items-center
+    rounded-none 
+    border-t 
+    border-custom_bg_light 
+    p-3 
+    gap-3
+  }
+  .student_button_menu_open {
+    @apply
+    bg-custom_bg_light
+    hover:bg-custom_bg_regular
+  }
 }

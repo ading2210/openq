@@ -8,7 +8,8 @@ export const api_endpoints = {
   validate_session: "/api/validate_session",
   students: "/api/students",
   assignments: "/api/assignments",
-  student_image: "/api/student_image/{0}"
+  student_image: "/api/student_image/{0}",
+  set_student: "/api/set_student/{0}"
 };
 
 export function set_q_endpoint(new_endpoint) {
@@ -63,6 +64,10 @@ export function login(username, password, callback) {
   utils.http_get(url, callback, {method: "POST", payload: payload, headers: encode_headers()});
 }
 
+export function logout() {
+  window.localStorage.clear();
+}
+
 export function validate_session(callback) {
   let url = api_endpoints.validate_session;
   utils.http_get(url, callback, {method: "HEAD", headers: encode_headers()});
@@ -74,7 +79,12 @@ export function get_students(callback) {
 }
 
 export function get_student_image(student_id, callback) {
-  let url = utils.format_string(api_endpoints.student_image, student_id)
+  let url = utils.format_string(api_endpoints.student_image, student_id);
+  utils.http_get(url, callback, {headers: encode_headers()});
+}
+
+export function set_student(student_id, callback) {
+  let url = utils.format_string(api_endpoints.set_student, student_id);
   utils.http_get(url, callback, {headers: encode_headers()});
 }
 

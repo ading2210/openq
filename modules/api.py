@@ -6,7 +6,7 @@ q_endpoints = {
   "login": "/Home/Login",
   "assignments": "/Home/LoadProfileData/Assignments",
   "main_page": "/Home/PortalMainPage",
-  "set_student": "/StudentBanner/SetStudentBanner/{student_id}",
+  "set_student": "/StudentBanner/SetStudentBanner/{id}",
   "student_image": "/StudentBanner/ShowImage/{student_id}"
 }
 
@@ -91,12 +91,12 @@ def get_students(endpoint, session, headers={}):
 
 #set the current student so that other data can be fetched
 def set_current_student(endpoint, session, student_id, headers={}):
-  url = endpoint + q_endpoints["set_student"].format(student_id=student_id)
+  url = endpoint + q_endpoints["set_student"].format(id=student_id)
   headers["cookie"] = construct_cookie(session)
   r = requests.get(url, headers=headers)
   
-  if r.headers.get("set-cookie"):
-    return extract_session(r.headers.get("set-cookie"))
+  if r.status_code == 304:
+    return True
   else:
     raise exceptions.BadGatewayError("Could not set the current student.")
 
