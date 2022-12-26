@@ -19,25 +19,38 @@ export function clear_obj(obj) {
   }
 }
 
+export function format_string(string) {
+  for (let i=1; i<arguments.length; i++) {
+    let replacement = arguments[i];
+    string = string.replace(`{${i-1}}`, replacement)
+  }
+  return string;
+}
+
+export function is_success(status) {
+  return (status+"")[0] != 2
+}
+
 export function http_get(url, callback, args={}) {
-  const defaults = {headers: [], method: "GET", payload: null, debug: false};
+  const defaults = {headers: [], method: "GET", payload: null};
   merge_args(defaults, args);
   
   //handle errors
   let actual_callback = function() {
+    this.success = (this.status+"")[0] == "2";
     try {
-      let data = JSON.parse(this.responseText);
-      if ((this.status+"")[0] != 2 && args.debug) {
+      this.json = JSON.parse(this.responseText);
+      if (!this.success) {
         let log_message = "";
         log_message += `Request to "${url}" failed with status ${this.status}.`;
-        log_message += `\n${data.error}: ${data.message}`;
-        if (typeof data.traceback != "undefined") {
-          log_message += "\n"+data.traceback;
+        log_message += `\n${this.json.error}: ${this.json.message}`;
+        if (typeof this.json.traceback != "undefined") {
+          log_message += "\n"+this.json.traceback;
         }
         console.warn(log_message);
       }
-      if (typeof data.session != "undefined") {
-        api.set_session(data.session);
+      if (typeof this.json.session != "undefined") {
+        api.set_session(this.json.session);
       }
     }
     catch (e) {}

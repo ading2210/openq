@@ -1,7 +1,7 @@
 from flask import Flask, render_template, send_from_directory, request
 from modules import api, utils, exceptions, datatypes
 import pathlib
-import logging
+import base64
 
 app = Flask(__name__)
 app.json_encoder = datatypes.CustomJSONEncoder
@@ -84,7 +84,6 @@ def get_students():
 
 @app.route("/api/set_student/<student_id>")
 def set_student(student_id):
-  print(student_id)
   try:
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
@@ -93,6 +92,23 @@ def set_student(student_id):
     new_session = api.set_current_student(endpoint, session, student_id, headers=headers)
     response = {"sucesss": True}
     return utils.generate_response(response, session=new_session)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+
+@app.route("/api/student_image/<student_id>")
+def get_student_image(student_id):
+  try:
+    auth, headers = utils.extract_data(request)
+    endpoint = auth["endpoint"]
+    session = auth["session"]
+    
+    data, content_type = api.get_student_image(endpoint, session, student_id, headers=headers)
+    b64_data = base64.b64encode(data).decode()
+    b64_string = f"data:{content_type};base64,{b64_data}"
+    response = {"b64": b64_string}
+    
+    return utils.generate_response(response)
     
   except Exception as e:
     return utils.handle_exception(e)
@@ -106,7 +122,15 @@ def homepage():
 @app.route("/assignments")
 def assignments():
   return render_template("assignments.html")
-  
+
+@app.route("/demographics")
+def demographics():
+  return render_template("demographics.html")
+
+@app.route("/attendance")
+def attendance():
+  return render_template("attendance.html")
+
 #===== assets and static files =====
 
 @app.route("/js/<path:path>")

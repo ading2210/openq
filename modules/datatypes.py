@@ -91,8 +91,10 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 #class for student data
 class Student:
+  #maps class attributes to table header ids
   attributes = {
     "id": None,
+    "student_id": None,
     "name": "StudentName",
     "grade": "Grade",
     "school": "SchoolName",
@@ -102,18 +104,21 @@ class Student:
     "counselor": "Counselor"
   }
   
-  def __init__(self, id, **kwargs):
+  def __init__(self, id, attributes={}, table_data={}):
     self.id = id
     
-    for key in kwargs:
-      if key in self.attributes:
-        setattr(self, key, kwargs[key])
     for key in self.attributes:
-      value = self.attributes[key]
-      if value in kwargs:
-        setattr(self, key, kwargs[value])
+      if key == "id": continue
+      if key in attributes:
+        setattr(self, key, attributes[key])
       else:
         setattr(self, key, None)
+          
+    if table_data != {}:
+      for key in self.attributes:
+        header_id = self.attributes[key]
+        if header_id in table_data:
+          setattr(self, key, table_data[header_id])
         
   def encode_as_dict(self):
     student_dict = {}

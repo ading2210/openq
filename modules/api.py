@@ -6,7 +6,8 @@ q_endpoints = {
   "login": "/Home/Login",
   "assignments": "/Home/LoadProfileData/Assignments",
   "main_page": "/Home/PortalMainPage",
-  "set_student": "/StudentBanner/SetStudentBanner/{student_id}"
+  "set_student": "/StudentBanner/SetStudentBanner/{student_id}",
+  "student_image": "/StudentBanner/ShowImage/{student_id}"
 }
 
 def debug_response(r):
@@ -76,8 +77,16 @@ def get_students(endpoint, session, headers={}):
 
   students = []
   for row in table.rows:
-    students.append(datatypes.Student(row.id, **row.data))
-  
+    attributes = {}
+    
+    student_id_regex = r'"\/StudentPortal\/StudentBanner\/ShowImage\/(\d+)"'
+    student_id_matches = re.findall(student_id_regex, row.data["unknown_1"])
+    if len(student_id_matches) == 1:
+      student_id = student_id_matches[0]
+      attributes["student_id"] = int(student_id)
+    
+    students.append(datatypes.Student(int(row.id), attributes=attributes, table_data=row.data))
+
   return students
 
 #set the current student so that other data can be fetched
@@ -90,3 +99,16 @@ def set_current_student(endpoint, session, student_id, headers={}):
     return extract_session(r.headers.get("set-cookie"))
   else:
     raise exceptions.BadGatewayError("Could not set the current student.")
+
+#get a student's image
+def get_student_image(endpoint, session, student_id, headers={}):
+  url = endpoint + q_endpoints["student_image"].format(student_id=student_id)
+  headers["cookie"] = construct_cookie(session)
+  r = requests.get(url, headers=headers)
+  
+  print(r.status_code)
+  
+  if r.status_code == 200 and r.headers.get("content-type"):
+    return r.content, r.headers.get("content-type")
+  else:
+    raise exceptions.BadGatewayError("Could not get the student image.")

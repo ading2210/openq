@@ -1,4 +1,4 @@
-import * as utils from "/js/utils.js"
+import * as utils from "/js/utils.js";
 
 export var q_endpoint = "";
 export var session = "";
@@ -7,7 +7,8 @@ export const api_endpoints = {
   login: "/api/login",
   validate_session: "/api/validate_session",
   students: "/api/students",
-  assignments: "/api/assignments"
+  assignments: "/api/assignments",
+  student_image: "/api/student_image/{0}"
 };
 
 export function set_q_endpoint(new_endpoint) {
@@ -18,8 +19,7 @@ export function set_session(new_session) {
 }
 export function retrieve_default_endpoint(debug=false) {
   let callback = function(r) {
-    let response = JSON.parse(r.responseText);
-    let endpoint = response.data.endpoint;
+    let endpoint = r.json.data.endpoint;
     if (debug) {console.log(`Setting endpoint to ${endpoint}`)}
     window.localStorage.setItem("q_endpoint", endpoint);
     set_q_endpoint(endpoint);
@@ -39,7 +39,7 @@ export function encode_headers(overrides={}){
 export function load_session() {
   if (window.localStorage.getItem("session") != null) {
     session = window.localStorage.getItem("session");
-    console.log(`Loading session from localStorage.`);
+    console.log(`Loaded session from localStorage.`);
     return session;
   }
   return null;
@@ -70,6 +70,11 @@ export function validate_session(callback) {
 
 export function get_students(callback) {
   let url = api_endpoints.students;
+  utils.http_get(url, callback, {headers: encode_headers()});
+}
+
+export function get_student_image(student_id, callback) {
+  let url = utils.format_string(api_endpoints.student_image, student_id)
   utils.http_get(url, callback, {headers: encode_headers()});
 }
 
