@@ -2,6 +2,7 @@ from flask import Flask, render_template, send_from_directory, request
 from modules import api, utils, exceptions, datatypes
 import pathlib
 import base64
+import time
 
 app = Flask(__name__)
 app.json_encoder = datatypes.CustomJSONEncoder
@@ -74,9 +75,17 @@ def get_students():
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
     
+    students = api.get_students(endpoint, auth["session"], headers=headers)
     response = {
-      "students": api.get_students(endpoint, auth["session"], headers=headers)
+      "students": students
     }
+    if len(students) == 1:
+      api.set_current_student(endpoint, auth["session"], students[0].id, headers=headers)
+      students[0].active = True
+    else:
+      for student in students:
+        student.active = False
+    
     return utils.generate_response(response)
     
   except Exception as e:
@@ -109,7 +118,11 @@ def get_student_image(student_id):
     b64_string = f"data:{content_type};base64,{b64_data}"
     response = {"b64": b64_string}
     
-    return utils.generate_response(response)
+    response_headers = {
+      "cache-control": "private, max-age=86400"
+    }
+    
+    return utils.generate_response(response, headers=response_headers)
     
   except Exception as e:
     return utils.handle_exception(e)
@@ -120,7 +133,11 @@ def get_asssignments():
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
     
-    return api.get_assignments(endpoint, auth["session"], headers=headers)
+    assignments = api.get_assignments(endpoint, auth["session"], headers=headers)
+    response = {
+      "assignments": assignments
+    }
+    return utils.generate_response(response)
     
   except Exception as e:
     return utils.handle_exception(e)

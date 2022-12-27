@@ -71,6 +71,7 @@ input[type="password"] {
     sidebar_button
     flex 
     items-center
+    text-left	
     rounded-none 
     border-t 
     border-custom_bg_light 

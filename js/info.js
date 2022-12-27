@@ -7,6 +7,7 @@ export const elements_list = [
   "arrows_seperate", "arrows_union", "logout_button"
 ];
 export const elements = {};
+export var selected_student = null;
 export var students = [];
 
 function main() {
@@ -50,6 +51,11 @@ function load_students() {
   });
 }
 
+function select_student(student_id) {
+  api.set_student(student_id, function(){});
+  toggle_students_menu();
+}
+
 function populate_students_menu(students) {
   for (let i=0; i<students.length; i++) {
     let student = students[i];
@@ -71,11 +77,19 @@ function populate_students_menu(students) {
     student_year.id = id_base+"_img";
     api.get_student_image(student.student_id, function(r){
       if (r.success) {
-        student_img.src = r.json.data.b64;
+        let img = r.json.data.b64;
+        student_img.src = img;
+        student.image = img;
+        
+        if (student.id == selected_student.id) {
+          elements.selected_student_img.src = img;
+        }
       }
     });
     
-    elements.students_menu.insertBefore(student_button, elements.students_menu.firstChild)
+    student_button.addEventListener("click", function(){select_student(student.id)});
+    
+    elements.students_menu.insertBefore(student_button, elements.logout_button);
   }
 }
 
@@ -95,14 +109,9 @@ function toggle_students_menu() {
 }
 
 function display_student(student) {
+  selected_student = student;
   elements.selected_student_name.innerHTML = student.name;
   elements.selected_student_year.innerHTML = student.year;
-  
-  api.get_student_image(student.student_id, function(r){
-    if (r.success) {
-      elements.selected_student_img.src = r.json.data.b64;
-    }
-  });
 }
 
 main();

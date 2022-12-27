@@ -1,4 +1,4 @@
-import base64, json, binascii, traceback, logging, os
+import base64, json, binascii, traceback, logging, os, gzip
 from modules import exceptions
 from urllib.parse import urlparse
 
@@ -41,7 +41,7 @@ def validate_url(url):
   return all([result.scheme, result.netloc, result.path])
 
 #generate a flask response from json data
-def generate_response(data, session=None, status=200):
+def generate_response(data, session=None, status=200, headers={}):
   response = {
     "status": status,
     "data": data,
@@ -49,7 +49,7 @@ def generate_response(data, session=None, status=200):
   if session != None:
     response["session"] = session
     
-  return response, status
+  return response, status, headers
 
 #convert an exception into a flask response
 def handle_exception(exception, debug=None):

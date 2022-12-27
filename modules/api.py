@@ -1,4 +1,4 @@
-import requests, json, re
+import requests, json, re, time
 from modules import utils, exceptions, datatypes
 import lxml.html
 
@@ -77,7 +77,9 @@ def get_students(endpoint, session, headers={}):
 
   students = []
   for row in table.rows:
-    attributes = {}
+    attributes = {
+      "id": int(row.id)
+    }
     
     student_id_regex = r'"\/StudentPortal\/StudentBanner\/ShowImage\/(\d+)"'
     student_id_matches = re.findall(student_id_regex, row.data["unknown_1"])
@@ -85,7 +87,7 @@ def get_students(endpoint, session, headers={}):
       student_id = student_id_matches[0]
       attributes["student_id"] = int(student_id)
     
-    students.append(datatypes.Student(int(row.id), attributes=attributes, table_data=row.data))
+    students.append(datatypes.Student(attributes=attributes, table_data=row.data))
 
   return students
 
@@ -115,6 +117,89 @@ def get_student_image(endpoint, session, student_id, headers={}):
 def get_assignments(endpoint, session, headers={}):
   url = endpoint + q_endpoints["assignments"]
   headers["cookie"] = construct_cookie(session)
-  r = requests.get(url, headers=headers)
   
-  return r.text
+  start_time = time.time()
+  r = requests.get(url, headers=headers)
+  request_finish = time.time()
+  
+  if r.status_code != 200:
+    raise exceptions.BadGatewayError(f"Could not fetch assignments. Endpoint returned status code {r.status_code}.")
+  
+  #parse html
+  document = lxml.html.document_fromstring(r.text)
+  
+  classes = []
+  counter = 0
+  while True:
+    counter += 1
+    
+    try:
+      table_element = document.get_element_by_id(f"tblassign_{counter}")
+    except KeyError:
+      break
+    table = datatypes.Table(table_element)
+  
+    #iterate through rows and process data
+    assignments = []
+    for row in table.rows:
+      table_data = row.data
+      attributes = {}
+      
+      attributes["graded"] = not table_data["notyetgraded"]
+      del table_data["notyetgraded"]
+      attributes["extra_credit"] = bool(table_data["extracredit"])
+      del table_data["extracredit"]
+      
+      assignment = datatypes.Assignment(attributes=attributes, table_data=table_data)
+      assignments.append(assignment)
+    
+    #extract class data
+    for child in table.element:
+      if child.tag == "thead":
+        thead = child
+        break
+    else:
+      raise exceptions.BadGatewayError("Could not extract class metadata.")
+    class_row = lxml.html.tostring(thead[0]).decode()
+    
+    #regex magic
+    def run_regex(pattern, replace="", regex_flags=[]):
+      matches = re.findall(pattern, class_row, *regex_flags)
+      if len(matches) > 0:
+        match = matches[0].strip().replace(replace, "")
+        return match
+      return None
+      
+    semester_regex = r'<label for="current" id="lblcurrent">Current</label>(.*?)<'
+    semester = run_regex(semester_regex, replace="&#160")
+    
+    grade_regex = r'<label for="grade" id="lblgrade">Grade</label>: </b>(.*?)[\s|<>]'
+    grade = run_regex(grade_regex)
+    
+    progress_regex = r'<a href="JavaScript:OpenProgress\((\d+)\);" id="lnk\d+" title="Student Progress Report" style="color:#FFFFFF;">'
+    progress_reports_id = run_regex(progress_regex)
+    
+    teacher_regex = r'<label for="teacher" id="lblteacher">Teacher</label>: </b>(.*?)<'
+    teacher = run_regex(teacher_regex, regex_flags=[re.S])
+    
+    course_code_regex = r': (\S+)\s+(.+) \((\d+)\)'
+    match = re.match(course_code_regex, table.caption.content);
+    if match:
+      period, course, course_code = match.groups()
+    else:
+      period = course = course_code = None
+    
+    #create class object
+    attributes = {
+      "teacher": teacher,
+      "course": course,
+      "course_code": course_code,
+      "period": period,
+      "semester": semester,
+      "assignments": assignments
+    }
+    classes.append(datatypes.Class(attributes=attributes))
+    
+  processing_finish = time.time()
+  
+  return classes
