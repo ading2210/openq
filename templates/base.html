@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link rel="stylesheet" href="/css/dist.css">
     {% block head %}
     {% endblock %}
@@ -14,14 +14,14 @@
       <nav class="w-full bg-custom_bg_dark p-3 pr-6 ring-1 ring-custom_bg_light">
         <div class="flex flex items-center justify-between mx-auto">
           <a href="/">
-            <img class="h-9" src="/assets/title.svg">
+            <img class="h-9 drop_shadow_fixed_sm" src="/assets/title.svg">
           </a>
           <ul class="flex gap-6">
             <li>
               <a href="/about" class="navbar_text">About</a>
             </li>
             <li>
-              <a href="https://github.com/ading2210/openq" class="navbar_text">Source Code</a>
+              <a href="https://github.com/ading2210/openq" target="_blank" class="navbar_text">Source Code</a>
             </li>
           </ul>
         </div>

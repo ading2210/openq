@@ -21,8 +21,9 @@ module.exports = {
       custom_text_alt: "#afaeb8",
       
       custom_accent_1: "#ae3e8f",
-      custom_accent_2_hover: "#983881",
-      custom_accent_2: "#8f0bdf",
+      custom_accent_1_hover: "#983881",
+      custom_accent_2: "#922cd1",
+      custom_accent_2_hover: "#a64ede",
       
       transparent: 'transparent',
       current: 'currentColor',

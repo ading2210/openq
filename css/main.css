@@ -83,4 +83,21 @@ input[type="password"] {
     bg-custom_bg_light
     hover:bg-custom_bg_regular
   }
+  .drop_shadow_fixed_sm {
+    @apply
+    drop-shadow-[0_1px_1px_rgba(0,0,0,0.40)]
+  }
+  .drop_shadow_fixed_md {
+    @apply
+    drop-shadow-[0_2px_2px_rgba(0,0,0,0.40)]
+  }
+  .drop_shadow_fixed_lg {
+    @apply
+    drop-shadow-[0_3px_3px_rgba(0,0,0,0.40)]
+  }
+  .generic_link {
+    @apply
+    underline
+    text-custom_accent_2_hover
+  }
 }

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Log In - Open Q{% endblock %}
+{% block title %}Log In - OpenQ{% endblock %}
 
 {% block head %}
 <script type="module" src="/js/login.js"></script>
@@ -9,7 +9,7 @@
 {% block content %}
 <div class="w-full p-4">
   <div class="mx-auto w-fit article_box pb-3">
-    <img class="h-24" src="/assets/title.svg">
+    <img class="h-24 drop-shadow-[0_3px_3px_rgba(0,0,0,0.40)]" src="/assets/title.svg">
     <h3 class="text-center text-xl mb-3">Login</h3>
     
     <form class="mb-2" id="login_form" name="login_form">
@@ -21,7 +21,7 @@
       <input class="text_input" type="password" id="password_input" name="password_input" placeholder="••••••••" autocomplete="current-password"><br>
       <p id="password_error_text" class="text-red-400 mb-1">&nbsp;</p>
       
-      <input class="w-full bg-custom_accent_1 text-white rounded p-1" type="submit" name="submit" id="submit" value="Sign In"/>
+      <input class="w-full bg-custom_accent_1 hover:bg-custom_accent_1_hover text-white rounded p-1" type="submit" name="submit" id="submit" value="Sign In"/>
     </form>
     
     <p id="error_text" class="text-red-400"></p>

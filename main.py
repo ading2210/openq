@@ -148,6 +148,10 @@ def get_asssignments():
 def homepage():
   return render_template("index.html")
 
+@app.route("/about")
+def about():
+  return render_template("about.html")
+
 @app.route("/assignments")
 def assignments():
   return render_template("assignments.html")
@@ -177,4 +181,8 @@ def css(path):
 #===== start server =====
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=5000, debug=utils.config["debug"])
+  host = utils.config["server_address"]
+  port = utils.config["server_port"]
+  debug = utils.config["debug"]
+  
+  app.run(host=host, port=port, debug=debug)
