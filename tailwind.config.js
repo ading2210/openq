@@ -8,7 +8,7 @@ module.exports = {
       backgroundColor: ['even'],
     },
     fontFamily: {
-      "sans": ["Fredoka", "ui-sans-serif"]
+      "sans": ["Fredoka", "ui-sans-serif", "arial"]
     },
     colors: {
       custom_bg_light: "#2f2944",

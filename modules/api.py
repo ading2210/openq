@@ -55,11 +55,15 @@ def login(endpoint, username, password, headers={}):
     "Pin": username,
     "Password": password
   }
+  timer = datatypes.RequestTimer()
   r = requests.post(url, data=payload, headers=headers)
+  timer.update_request()
   data = r.json()
   
   if data["valid"] == "1":
-    return extract_session(r.headers.get("set-cookie"))
+    session = extract_session(r.headers.get("set-cookie"))
+    timer.update_finished()
+    return datatypes.APIResult(session=session, success=True, timer=timer)
   else:
     raise exceptions.ForbiddenError("Username/Password is invalid.")
 
@@ -67,7 +71,9 @@ def login(endpoint, username, password, headers={}):
 def get_students(endpoint, session, headers={}):
   url = endpoint + q_endpoints["main_page"]
   headers["cookie"] = construct_cookie(session)
+  timer = datatypes.RequestTimer()
   r = requests.get(url, headers=headers)
+  timer.update_request()
 
   document = lxml.html.document_fromstring(r.text)
   table_element = document.get_element_by_id("stuBannerTable")
@@ -88,17 +94,20 @@ def get_students(endpoint, session, headers={}):
       attributes["student_id"] = int(student_id)
     
     students.append(datatypes.Student(attributes=attributes, table_data=row.data))
-
-  return students
+  
+  timer.update_finished()
+  return datatypes.APIResult(students=students, timer=timer)
 
 #set the current student so that other data can be fetched
 def set_current_student(endpoint, session, q_id, headers={}):
   url = endpoint + q_endpoints["set_student"].format(q_id=q_id)
   headers["cookie"] = construct_cookie(session)
+  timer = datatypes.RequestTimer()
   r = requests.get(url, headers=headers, allow_redirects=False)
+  timer.update_request()
 
   if r.status_code == 302:
-    return True
+    return datatypes.APIResult(success=True, timer=timer)
   else:
     raise exceptions.BadGatewayError(f"Could not set the current student. Endpoint returned status code {r.status_code}.")
 
@@ -106,10 +115,14 @@ def set_current_student(endpoint, session, q_id, headers={}):
 def get_student_image(endpoint, session, student_id, headers={}):
   url = endpoint + q_endpoints["student_image"].format(student_id=student_id)
   headers["cookie"] = construct_cookie(session)
+  
+  timer = datatypes.RequestTimer()
   r = requests.get(url, headers=headers)
+  timer.update_request()
   
   if r.status_code == 200 and r.headers.get("content-type"):
-    return r.content, r.headers.get("content-type")
+    content_type = r.headers.get("content-type")
+    return datatypes.APIResult(data=r.content, timer=timer, content_type=content_type)
   else:
     raise exceptions.BadGatewayError("Could not get the student image.")
 
@@ -118,9 +131,9 @@ def get_assignments(endpoint, session, headers={}):
   url = endpoint + q_endpoints["assignments"]
   headers["cookie"] = construct_cookie(session)
   
-  start_time = time.time()
+  timer = datatypes.RequestTimer()
   r = requests.get(url, headers=headers)
-  request_finish = time.time()
+  timer.update_request()
   
   if r.status_code != 200:
     raise exceptions.BadGatewayError(f"Could not fetch assignments. Endpoint returned status code {r.status_code}.")
@@ -171,7 +184,7 @@ def get_assignments(endpoint, session, headers={}):
       return None
       
     semester_regex = r'<label for="current" id="lblcurrent">Current</label>(.*?)<'
-    semester = run_regex(semester_regex, replace="&#160")
+    semester = run_regex(semester_regex, replace="&#160;")
     
     grade_regex = r'<label for="grade" id="lblgrade">Grade</label>: </b>(.*?)[\s|<>]'
     grade = run_regex(grade_regex)
@@ -200,6 +213,5 @@ def get_assignments(endpoint, session, headers={}):
     }
     classes.append(datatypes.Class(attributes=attributes))
     
-  processing_finish = time.time()
-  
-  return classes
+  timer.update_finished()
+  return datatypes.APIResult(classes=classes, timer=timer)

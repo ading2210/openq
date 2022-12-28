@@ -1,8 +1,8 @@
-import * as api from "/js/api.js";
-import * as utils from "/js/utils.js";
+import * as api from "/js/modules/api.js";
+import * as utils from "/js/modules/utils.js";
 
 export var elements = {};
-export var elements_list = [
+export const elements_list = [
   "password_input", "username_input", "login_form",
   "error_text", "username_error_text", "password_error_text"
 ];
@@ -24,18 +24,16 @@ function main() {
       }
       else {
         console.log("Stored session is not valid.");
+        window.localStorage.clear();
       }
     });
   }
   
-  window.onload = onload;
+  window.addEventListener("load", on_load);
 }
 
-function onload() {
-  for (let id of elements_list) {
-    let element = document.getElementById(id);
-    elements[id] = element;
-  }
+function on_load() {
+  elements = utils.get_elements(elements_list);
   
   let events = ["blur", "keyup", "keydown"];
   for (let event of events) {

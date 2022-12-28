@@ -14,6 +14,9 @@ utils.load_config(config_path)
 if utils.config["debug"]:
   print("Debug mode enabled. Stacktraces will be included in error responses.")
 
+if utils.config["default_endpoint"] == None:
+  raise Exception("Please set the default Q endpoint in config.json.")
+
 #===== error pages =====
 
 @app.errorhandler(404)
@@ -44,9 +47,9 @@ def login():
     if data["password"] == "":
       raise exceptions.BadRequestError("Password cannot be empty.")
     
-    session = api.login(auth["endpoint"], data["username"], data["password"], headers=headers)
+    result = api.login(auth["endpoint"], data["username"], data["password"], headers=headers)
     response = {"success": True}
-    return utils.generate_response(response, session)
+    return utils.generate_response(response, result.session)
   
   except Exception as e:
     return utils.handle_exception(e)
@@ -75,10 +78,8 @@ def get_students():
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
     
-    students = api.get_students(endpoint, auth["session"], headers=headers)
-    response = {
-      "students": students
-    }
+    result = api.get_students(endpoint, auth["session"], headers=headers)
+    students = result.students
     if len(students) == 1:
       api.set_current_student(endpoint, auth["session"], students[0].id, headers=headers)
       students[0].active = True
@@ -86,7 +87,7 @@ def get_students():
       for student in students:
         student.active = False
     
-    return utils.generate_response(response)
+    return utils.generate_response(result)
     
   except Exception as e:
     return utils.handle_exception(e)
@@ -98,9 +99,8 @@ def set_student(student_id):
     endpoint = auth["endpoint"]
     session = auth["session"]
     
-    api.set_current_student(endpoint, session, student_id, headers=headers)
-    response = {"sucesss": True}
-    return utils.generate_response(response)
+    result = api.set_current_student(endpoint, session, student_id, headers=headers)
+    return utils.generate_response(result)
     
   except Exception as e:
     return utils.handle_exception(e)
@@ -113,10 +113,13 @@ def get_student_image(student_id):
     session = auth["session"]
     
     #todo: don't use base64
-    data, content_type = api.get_student_image(endpoint, session, student_id, headers=headers)
-    b64_data = base64.b64encode(data).decode()
-    b64_string = f"data:{content_type};base64,{b64_data}"
-    response = {"b64": b64_string}
+    result = api.get_student_image(endpoint, session, student_id, headers=headers)
+    b64_data = base64.b64encode(result.data).decode()
+    b64_string = f"data:{result.content_type};base64,{b64_data}"
+    response = {
+      "b64": b64_string,
+      "timer": result.timer
+    }
     
     response_headers = {
       "cache-control": "private, max-age=86400"
@@ -133,11 +136,8 @@ def get_asssignments():
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
     
-    assignments = api.get_assignments(endpoint, auth["session"], headers=headers)
-    response = {
-      "assignments": assignments
-    }
-    return utils.generate_response(response)
+    result = api.get_assignments(endpoint, auth["session"], headers=headers)
+    return utils.generate_response(result)
     
   except Exception as e:
     return utils.handle_exception(e)

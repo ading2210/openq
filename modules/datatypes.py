@@ -1,6 +1,39 @@
-import json, re
+import json, re, time
 import lxml.html
 from modules import exceptions
+
+#class for api request times
+class RequestTimer:
+  def __init__(self):
+    self.start = time.time()*1000
+    self.request = self.request_time = self.finish = 0
+    self.processing_time = self.total_time = 0
+    
+  def update_request(self):
+    self.request = time.time()*1000
+    self.request_time = self.request - self.start
+    self.total_time = self.request_time
+  
+  def update_finished(self):
+    self.finish = time.time()*1000
+    self.total_time = self.finish - self.start
+    self.processing_time = self.finish - self.request
+  
+  def encode_as_dict(self):
+    return {
+      "request_time": self.request_time,
+      "processing_time": self.processing_time,
+      "total_time": self.total_time
+    }
+
+#class for data returned from the api
+class APIResult:
+  def __init__(self, **kwargs):
+    for key in kwargs:
+      setattr(self, key, kwargs[key])
+  
+  def encode_as_dict(self):
+    return vars(self)
 
 #classes for tables
 class TableColumn:
@@ -211,5 +244,5 @@ class Assignment(DataClass):
     "score_percent": "pctscore",
     "points_possible": "ptspossible",
     "points_earned": "score",
-    "scoredas": "scoredas"
+    "scored_as": "scoredas"
   }

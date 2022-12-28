@@ -1,62 +1,69 @@
-import * as api from "/js/api.js"
-import * as utils from "/js/utils.js";
+import * as api from "/js/modules/api.js"
+import * as utils from "/js/modules/utils.js";
 
 export const elements_list = [
   "selected_student_name", "selected_student_year", "selected_student_img",
   "selected_student", "menu_student_template", "students_menu",
   "arrows_seperate", "arrows_union", "logout_button"
 ];
-export const elements = {};
+export var elements = {};
 export var selected_student = null;
-export var students = [];
+export var students = null;
+export var on_students_load = null;
 
-function main() {
+export function main() {
   //load q endpoint and session
   if (api.load_q_endpoint() == null) {
     api.retrieve_default_endpoint(true);
   }
   api.load_session();
   
-  window.onload = onload;
+  window.addEventListener("load", on_load);
 }
 
-function onload() {
-  for (let id of elements_list) {
-    let element = document.getElementById(id);
-    elements[id] = element;
-  }
+export function on_load() {
+  elements = utils.get_elements(elements_list);
   
   elements.logout_button.addEventListener("click", function(){
     api.logout();
     console.log("Logged out. Redirecting...");
     window.location.href = "/";
-  })
+  });
   
-  console.log("Loading students...")
+  console.log("Loading students...");
   load_students();
 }
 
-function load_students() {
+export function set_students_callback(callback) {
+  on_students_load = callback;
+}
+
+export function load_students() {
   api.get_students(function(r){
     if (r.success) {
       students = r.json.data.students;
       display_student(students[0]);
       populate_students_menu(students);
       elements.selected_student.addEventListener("click", toggle_students_menu);
+      
+      if (typeof on_students_load == "function") {
+        on_students_load(r);
+      }
     }
     else {
       console.log("Stored session is not valid. Redirecting...");
+      window.localStorage.clear();
       window.location.href = "/";
     }
   });
 }
 
-function select_student(student_id) {
+export function select_student(student_id) {
   api.set_student(student_id, function(){});
   toggle_students_menu();
 }
 
-function populate_students_menu(students) {
+export function populate_students_menu(students) {
   for (let i=0; i<students.length; i++) {
     let student = students[i];
     let id_base = `menu_student_${i}`;
@@ -93,7 +100,7 @@ function populate_students_menu(students) {
   }
 }
 
-function toggle_students_menu() {
+export function toggle_students_menu() {
   if (elements.students_menu.style.display == "flex") {
     elements.students_menu.style.display = "none";
     elements.arrows_seperate.style.display = "initial";
@@ -108,10 +115,8 @@ function toggle_students_menu() {
   }
 }
 
-function display_student(student) {
+export function display_student(student) {
   selected_student = student;
   elements.selected_student_name.innerHTML = student.name;
   elements.selected_student_year.innerHTML = student.year;
 }
-
-main();

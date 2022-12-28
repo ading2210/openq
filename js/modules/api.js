@@ -1,4 +1,4 @@
-import * as utils from "/js/utils.js";
+import * as utils from "/js/modules/utils.js";
 
 export var q_endpoint = "";
 export var session = "";

@@ -3,5 +3,6 @@
   "server_port": 5000,
   "server_address": "0.0.0.0",
   "default_endpoint": null,
-  "gzip_level": 9
+  "gzip_level": 9,
+  "indent_json": false
 }

@@ -56,10 +56,15 @@ def generate_response(data, session=None, status=200, headers={}, gzip_level=Non
   if gzip_level == False:
     content = response_data
   else:
-    content_uncompressed = json.dumps(response_data, cls=datatypes.CustomJSONEncoder)
+    if config["indent_json"] != False:
+      indent = config["indent_json"]
+      content_uncompressed = json.dumps(response_data, indent=indent, cls=datatypes.CustomJSONEncoder)
+    else:
+      content_uncompressed = json.dumps(response_data, cls=datatypes.CustomJSONEncoder)
     content = gzip.compress(content_uncompressed.encode('utf8'), gzip_level)
     headers["content-length"] = len(content)
     headers["content-encoding"] = "gzip"
+    headers["content-type"] = "application/json"
   
   response = make_response(content)
   response.status_code = status
