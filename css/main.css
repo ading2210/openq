@@ -100,4 +100,26 @@ input[type="password"] {
     underline
     text-custom_accent_2_hover
   }
+  .table {
+    @apply
+    ring-1
+    ring-custom_bg_alt 
+    w-fit 
+    table-auto 
+    rounded-lg
+    overflow-hidden
+  }
+  .table_cell {
+    @apply
+    py-2
+    px-4
+    text-sm
+  }
+  .table_row {
+    @apply
+    hover:bg-custom_bg_light
+    bg-custom_bg_regular
+    border-t
+    border-custom_bg_alt
+  }
 }

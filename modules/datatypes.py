@@ -218,7 +218,7 @@ class Student(DataClass):
     "counselor": "Counselor"
   }
 
-class Class(DataClass):
+class Course(DataClass):
   attributes = {
     "classroom": None,
     "teacher": None,
@@ -229,7 +229,8 @@ class Class(DataClass):
     "term": None,
     "period": None,
     "assignments": None,
-    "semester": None
+    "semester": None,
+    "grade": None
   }
 
 class Assignment(DataClass):

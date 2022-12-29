@@ -1,7 +1,7 @@
 import base64, json, binascii, traceback, logging, os, gzip
 from modules import exceptions, datatypes
 from urllib.parse import urlparse
-from flask import make_response
+from flask import make_response, send_from_directory
 
 config = {}
 exception_dict = {
@@ -45,7 +45,7 @@ def validate_url(url):
 def generate_response(data, session=None, status=200, headers={}, gzip_level=None):
   response_data = {
     "status": status,
-    "data": data,
+    "data": data
   }
   if session != None:
     response_data["session"] = session

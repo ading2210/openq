@@ -9,7 +9,8 @@ export const api_endpoints = {
   students: "/api/students",
   assignments: "/api/assignments",
   student_image: "/api/student_image/{0}",
-  set_student: "/api/set_student/{0}"
+  set_student: "/api/set_student/{0}",
+  courses: "/api/courses"
 };
 
 export function set_q_endpoint(new_endpoint) {
@@ -90,5 +91,10 @@ export function set_student(student_id, callback) {
 
 export function get_assignments(callback) {
   let url = api_endpoints.assignments;
+  utils.http_get(url, callback, {headers: encode_headers()});
+}
+
+export function get_courses(callback) {
+  let url = api_endpoints.courses;
   utils.http_get(url, callback, {headers: encode_headers()});
 }

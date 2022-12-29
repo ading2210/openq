@@ -30,7 +30,6 @@ export function on_load() {
     window.location.href = "/";
   });
   
-  console.log("Loading students...");
   load_students();
 }
 
@@ -41,6 +40,7 @@ export function set_students_callback(callback) {
 export function load_students() {
   api.get_students(function(r){
     if (r.success) {
+      console.log(`Loaded students from API.`)
       students = r.json.data.students;
       display_student(students[0]);
       populate_students_menu(students);
@@ -58,8 +58,14 @@ export function load_students() {
   });
 }
 
-export function select_student(student_id) {
-  api.set_student(student_id, function(){});
+export function select_student(id) {
+  api.set_student(id, function(){});
+  for (let student of students) {
+    if (student.id == id) {
+      selected_student = student;
+      break;
+    }
+  }
   toggle_students_menu();
 }
 

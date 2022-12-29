@@ -127,7 +127,7 @@ def get_student_image(endpoint, session, student_id, headers={}):
     raise exceptions.BadGatewayError("Could not get the student image.")
 
 #get all assignments
-def get_assignments(endpoint, session, headers={}):
+def get_assignments(endpoint, session, headers={}, courses_only=False):
   url = endpoint + q_endpoints["assignments"]
   headers["cookie"] = construct_cookie(session)
   
@@ -141,7 +141,7 @@ def get_assignments(endpoint, session, headers={}):
   #parse html
   document = lxml.html.document_fromstring(r.text)
   
-  classes = []
+  courses = []
   counter = 0
   while True:
     counter += 1
@@ -151,21 +151,22 @@ def get_assignments(endpoint, session, headers={}):
     except KeyError:
       break
     table = datatypes.Table(table_element)
-  
+    
     #iterate through rows and process data
     assignments = []
-    for row in table.rows:
-      table_data = row.data
-      attributes = {}
+    if not courses_only:
+      for row in table.rows:
+        table_data = row.data
+        attributes = {}
+        
+        attributes["graded"] = not table_data["notyetgraded"]
+        del table_data["notyetgraded"]
+        attributes["extra_credit"] = bool(table_data["extracredit"])
+        del table_data["extracredit"]
+        
+        assignment = datatypes.Assignment(attributes=attributes, table_data=table_data)
+        assignments.append(assignment)
       
-      attributes["graded"] = not table_data["notyetgraded"]
-      del table_data["notyetgraded"]
-      attributes["extra_credit"] = bool(table_data["extracredit"])
-      del table_data["extracredit"]
-      
-      assignment = datatypes.Assignment(attributes=attributes, table_data=table_data)
-      assignments.append(assignment)
-    
     #extract class data
     for child in table.element:
       if child.tag == "thead":
@@ -199,6 +200,7 @@ def get_assignments(endpoint, session, headers={}):
     match = re.match(course_code_regex, table.caption.content);
     if match:
       period, course, course_code = match.groups()
+      course_code = int(course_code)
     else:
       period = course = course_code = None
     
@@ -209,9 +211,10 @@ def get_assignments(endpoint, session, headers={}):
       "course_code": course_code,
       "period": period,
       "semester": semester,
-      "assignments": assignments
+      "assignments": assignments,
+      "grade": grade
     }
-    classes.append(datatypes.Class(attributes=attributes))
+    courses.append(datatypes.Course(attributes=attributes))
     
   timer.update_finished()
-  return datatypes.APIResult(classes=classes, timer=timer)
+  return datatypes.APIResult(courses=courses, timer=timer)

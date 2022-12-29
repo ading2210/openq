@@ -4,9 +4,10 @@ OpenQ is an open source frontend for [Q Student Connection](https://www.myaequit
 
 ## Features:
 
-Currently OpenQ is able to:
+Currently, OpenQ is able to:
  - Login
  - List and display students
+ - List courses and grades
 
 Since OpenQ is in early development, the current feature set is very incomplete.
 

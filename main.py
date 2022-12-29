@@ -142,6 +142,18 @@ def get_asssignments():
   except Exception as e:
     return utils.handle_exception(e)
 
+@app.route("/api/courses")
+def get_courses():
+  try:
+    auth, headers = utils.extract_data(request)
+    endpoint = auth["endpoint"]
+    
+    result = api.get_assignments(endpoint, auth["session"], headers=headers, courses_only=True)
+    return utils.generate_response(result)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+
 #===== user-visible pages =====
 
 @app.route("/")
@@ -156,6 +168,7 @@ def about():
 def assignments():
   return render_template("assignments.html")
 
+#not implemented yet
 @app.route("/demographics")
 def demographics():
   return render_template("demographics.html")
