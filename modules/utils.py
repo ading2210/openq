@@ -42,7 +42,7 @@ def validate_url(url):
   return all([result.scheme, result.netloc, result.path])
 
 #generate a flask response from json data
-def generate_response(data, session=None, status=200, headers={}, gzip_level=None):
+def generate_response(data, session=None, status=200, headers={}):
   response_data = {
     "status": status,
     "data": data
@@ -50,24 +50,7 @@ def generate_response(data, session=None, status=200, headers={}, gzip_level=Non
   if session != None:
     response_data["session"] = session
   
-  if gzip_level == None:
-    gzip_level = config["gzip_level"]
-
-  if gzip_level == False:
-    content = response_data
-  else:
-    if config["indent_json"] != False:
-      indent = config["indent_json"]
-      content_uncompressed = json.dumps(response_data, indent=indent, cls=datatypes.CustomJSONEncoder)
-    else:
-      content_uncompressed = json.dumps(response_data, cls=datatypes.CustomJSONEncoder)
-    content = gzip.compress(content_uncompressed.encode('utf8'), gzip_level)
-    headers["content-length"] = len(content)
-    headers["content-encoding"] = "gzip"
-    headers["content-type"] = "application/json"
-    headers["original-length"] = len(content_uncompressed)
-  
-  response = make_response(content)
+  response = make_response(response_data)
   response.status_code = status
   for key in headers:
     response.headers[key] = headers[key]

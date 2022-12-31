@@ -82,13 +82,19 @@ export function get_students(callback) {
   utils.http_get(url, callback, {headers: encode_headers()});
 }
 
-export function get_student_image(student_id, callback) {
+export function get_student_image(callback, args) {
+  const defaults = {student_id: null, size: null};
+  utils.merge_args(defaults, args);
+  
   let url;
-  if (student_id) {
-    url = utils.format_string(api_endpoints.student_image, student_id);
+  if (args.student_id) {
+    url = utils.format_string(api_endpoints.student_image, args.student_id);
   }
   else {
     url = api_endpoints.student_image_alt;
+  }
+  if (args.size != null) {
+    url += `?size=${args.size}`;
   }
   utils.http_get(url, callback, {headers: encode_headers()});
 }

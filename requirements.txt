@@ -1,3 +1,5 @@
-Flask
+flask
 pytailwindcss
 lxml
+flask-compress
+pillow

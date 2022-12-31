@@ -88,7 +88,7 @@ export function populate_students_menu(students) {
     
     let student_img = student_button.querySelector("#menu_student_template_img");
     student_year.id = id_base+"_img";
-    api.get_student_image(student.student_id, function(r){
+    api.get_student_image(function(r){
       if (r.success) {
         let img = r.json.data.b64;
         student_img.src = img;
@@ -98,7 +98,7 @@ export function populate_students_menu(students) {
           elements.selected_student_img.src = img;
         }
       }
-    });
+    }, {student_id: student.student_id, size: 128});
     
     student_button.addEventListener("click", function(){select_student(student.id)});
     

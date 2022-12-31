@@ -1,11 +1,11 @@
 from flask import Flask, render_template, send_from_directory, request
+from flask_compress import Compress
+from PIL import Image
 from modules import api, utils, exceptions, datatypes
 import pathlib
 import base64
 import time
-
-app = Flask(__name__)
-app.json_encoder = datatypes.CustomJSONEncoder
+import io
 
 #===== load config =====
 base_path = pathlib.Path(__file__).parent.resolve()
@@ -16,6 +16,16 @@ if utils.config["debug"]:
 
 if utils.config["default_endpoint"] == None:
   raise Exception("Please set the default Q endpoint in config.json.")
+  
+#===== create flask instance =====
+
+app = Flask(__name__)
+app.json_encoder = datatypes.CustomJSONEncoder
+if utils.config["gzip_level"] != False:
+  Compress(app)
+  app.config["COMPRESS_ALGORITHM"] = "gzip"
+  app.config["COMPRESS_LEVEL"] = utils.config["gzip_level"]
+  app.config["COMPRESS_MIMETYPES"].append("image/svg+xml")
 
 #===== error pages =====
 
@@ -24,6 +34,14 @@ def hanle_404(e):
   return render_template("404.html"), 404
   
 #===== api routes =====
+
+def generic_api_route(request, api_method, *args, **kwargs):
+  try:
+    auth, headers = utils.extract_data(request)
+    result = api_method(auth["endpoint"], auth["session"], *args, **kwargs)
+    return utils.generate_response(result)
+  except Exception as e:
+    return utils.handle_exception(e)
 
 @app.route("/api/default_endpoint", methods=["GET"])
 def get_default_endpoint():
@@ -94,16 +112,7 @@ def get_students():
 
 @app.route("/api/set_student/<student_id>")
 def set_student(student_id):
-  try:
-    auth, headers = utils.extract_data(request)
-    endpoint = auth["endpoint"]
-    session = auth["session"]
-    
-    result = api.set_current_student(endpoint, session, student_id, headers=headers)
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
+  return generic_api_route(request, api.set_current_student, q_id=student_id)
 
 @app.route("/api/student_image")
 @app.route("/api/student_image/<student_id>")
@@ -115,7 +124,33 @@ def get_student_image(student_id=None):
     
     #todo: don't use base64
     result = api.get_student_image(endpoint, session, student_id, headers=headers)
-    b64_data = base64.b64encode(result.data).decode()
+    
+    #resize and compress image if applicable
+    resized_size = request.args.get("size")
+    if resized_size:
+      resized_size = int(resized_size)
+      img = Image.open(io.BytesIO(result.data))
+      width, height = img.size
+      
+      #resize image
+      if resized_size > max(height, width):
+        raise exceptions.BadRequestError("Image size too large.")
+      new_size = resized_size, resized_size
+      img.thumbnail(new_size, Image.Resampling.LANCZOS)
+      
+      #strip exif data from iamge
+      img_data = list(img.getdata())
+      image_stripped = Image.new(img.mode, img.size)
+      image_stripped.putdata(img_data)
+      
+      #compress image
+      img_bytes = io.BytesIO()
+      image_stripped.save(img_bytes, format="jpeg", optimize=True, quality=85)
+      data = img_bytes.getvalue()
+    else:
+      data = result.data
+    
+    b64_data = base64.b64encode(data).decode()
     b64_string = f"data:{result.content_type};base64,{b64_data}"
     response = {
       "b64": b64_string,
@@ -126,6 +161,7 @@ def get_student_image(student_id=None):
       "cache-control": "private, max-age=86400"
     }
     
+    result.timer.update_finished()
     return utils.generate_response(response, headers=response_headers)
     
   except Exception as e:
@@ -133,44 +169,20 @@ def get_student_image(student_id=None):
 
 @app.route("/api/assignments")
 def get_asssignments():
-  try:
-    auth, headers = utils.extract_data(request)
-    result = api.get_assignments(auth["endpoint"], auth["session"], headers=headers)
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
+  return generic_api_route(request, api.get_assignments)
 
 @app.route("/api/courses")
 def get_courses():
-  try:
-    auth, headers = utils.extract_data(request)
-    result = api.get_assignments(auth["endpoint"], auth["session"], headers=headers, courses_only=True)
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
+  return generic_api_route(request, api.get_assignments, courses_only=True)
 
 @app.route("/api/demographics")
 def get_demographics():
-  try:
-    auth, headers = utils.extract_data(request)
-    result = api.get_demographics(auth["endpoint"], auth["session"], headers=headers)
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
+  return generic_api_route(request, api.get_demographics)
 
 @app.route("/api/attendance")
 def get_attendance():
-  try:
-    auth, headers = utils.extract_data(request)
-    result = api.get_attendance(auth["endpoint"], auth["session"], headers=headers)
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
-    
+  return generic_api_route(request, api.get_attendance)
+
 #===== user-visible pages =====
 
 @app.route("/")

@@ -27,6 +27,7 @@ def debug_response(r):
   }
   return response
 
+#extract session from response
 def extract_session(cookie):
   session_regex_1 = r"ASP\.NET_SessionId=([^;^ ]+)"
   session_regex_2 = r"LM_Aequitas=([^;^ ]+)"
@@ -44,6 +45,7 @@ def extract_session(cookie):
   session = f"{matches_1[0]}:{matches_2[0]}"
   return session
 
+#construct cookie string from session
 def construct_cookie(session):
   session_split = session.split(":")
   if len(session_split) != 2:
