@@ -105,8 +105,9 @@ def set_student(student_id):
   except Exception as e:
     return utils.handle_exception(e)
 
+@app.route("/api/student_image")
 @app.route("/api/student_image/<student_id>")
-def get_student_image(student_id):
+def get_student_image(student_id=None):
   try:
     auth, headers = utils.extract_data(request)
     endpoint = auth["endpoint"]
@@ -134,9 +135,7 @@ def get_student_image(student_id):
 def get_asssignments():
   try:
     auth, headers = utils.extract_data(request)
-    endpoint = auth["endpoint"]
-    
-    result = api.get_assignments(endpoint, auth["session"], headers=headers)
+    result = api.get_assignments(auth["endpoint"], auth["session"], headers=headers)
     return utils.generate_response(result)
     
   except Exception as e:
@@ -146,14 +145,32 @@ def get_asssignments():
 def get_courses():
   try:
     auth, headers = utils.extract_data(request)
-    endpoint = auth["endpoint"]
-    
-    result = api.get_assignments(endpoint, auth["session"], headers=headers, courses_only=True)
+    result = api.get_assignments(auth["endpoint"], auth["session"], headers=headers, courses_only=True)
     return utils.generate_response(result)
     
   except Exception as e:
     return utils.handle_exception(e)
 
+@app.route("/api/demographics")
+def get_demographics():
+  try:
+    auth, headers = utils.extract_data(request)
+    result = api.get_demographics(auth["endpoint"], auth["session"], headers=headers)
+    return utils.generate_response(result)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+
+@app.route("/api/attendance")
+def get_attendance():
+  try:
+    auth, headers = utils.extract_data(request)
+    result = api.get_attendance(auth["endpoint"], auth["session"], headers=headers)
+    return utils.generate_response(result)
+    
+  except Exception as e:
+    return utils.handle_exception(e)
+    
 #===== user-visible pages =====
 
 @app.route("/")

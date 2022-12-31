@@ -9,8 +9,11 @@ export const api_endpoints = {
   students: "/api/students",
   assignments: "/api/assignments",
   student_image: "/api/student_image/{0}",
+  student_image_alt: "/api/student_image",
   set_student: "/api/set_student/{0}",
-  courses: "/api/courses"
+  courses: "/api/courses",
+  demographics: "/api/demographics",
+  attendance: "/api/attendance"
 };
 
 export function set_q_endpoint(new_endpoint) {
@@ -80,7 +83,13 @@ export function get_students(callback) {
 }
 
 export function get_student_image(student_id, callback) {
-  let url = utils.format_string(api_endpoints.student_image, student_id);
+  let url;
+  if (student_id) {
+    url = utils.format_string(api_endpoints.student_image, student_id);
+  }
+  else {
+    url = api_endpoints.student_image_alt;
+  }
   utils.http_get(url, callback, {headers: encode_headers()});
 }
 
@@ -96,5 +105,15 @@ export function get_assignments(callback) {
 
 export function get_courses(callback) {
   let url = api_endpoints.courses;
+  utils.http_get(url, callback, {headers: encode_headers()});
+}
+
+export function get_demographics(callback) {
+  let url = api_endpoints.demographics;
+  utils.http_get(url, callback, {headers: encode_headers()});
+}
+
+export function get_attendance(callback) {
+  let url = api_endpoints.attendance;
   utils.http_get(url, callback, {headers: encode_headers()});
 }

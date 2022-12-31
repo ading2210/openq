@@ -181,9 +181,14 @@ class CustomJSONEncoder(json.JSONEncoder):
     else:
       return json.JSONEncoder.default(self, obj)
 
+#generic class to represnt data
 class DataClass:
   attributes = {}
+  encode_nonetype = False
   def __init__(self, attributes={}, table_data={}):
+    self.attributes_inverted = {}
+    for key, value in self.attributes.items():
+      self.attributes_inverted[value] = key
 
     for key in self.attributes:
       if key in attributes:
@@ -200,7 +205,7 @@ class DataClass:
   def encode_as_dict(self):
     student_dict = {}
     for key in self.attributes:
-      if getattr(self, key) != None:
+      if self.encode_nonetype or getattr(self, key) is not None:
         student_dict[key] = getattr(self, key)
     return student_dict
 
@@ -218,6 +223,7 @@ class Student(DataClass):
     "counselor": "Counselor"
   }
 
+#class for course data
 class Course(DataClass):
   attributes = {
     "classroom": None,
@@ -230,9 +236,14 @@ class Course(DataClass):
     "period": None,
     "assignments": None,
     "semester": None,
-    "grade": None
+    "grade": None,
+    
+    "tardy": None,
+    "excused": None,
+    "unexcused": None
   }
 
+#class for assignment data
 class Assignment(DataClass):
   attributes = {
     "title": "assignment",
@@ -246,4 +257,61 @@ class Assignment(DataClass):
     "points_possible": "ptspossible",
     "points_earned": "score",
     "scored_as": "scoredas"
+  }
+
+#classes for attendance data
+class Attendance(DataClass):
+  attributes = {
+    "summary_classes": None,
+    "summary_reason": None,
+    "attendance_items": None
+  }
+
+class AttendanceReasons(DataClass):
+  attributes = {
+    "present": "Present",
+    "absent": "Absent",
+    "sick": "Illness or Sickness Only",
+    "field_trip": "Field Trip",
+    "tardy": "Unex Tardy Less than 30 min"
+  }
+
+class AttendanceItem(DataClass):
+  attributes = {
+    "reason": None,
+    "course": None,
+    "course_code": None,
+    "date": "date",
+    "period": "period",
+    "teacher": "teacher"
+  }
+
+#class for demographics data
+class Demographics(DataClass):
+  encode_nonetype = True
+  attributes = {
+    "name": "name",
+    "student_id": "ident",
+    "nickname": "nickname",
+    "state_id": "stateid",
+    "birth_date": "birthdate",
+    "school": "schname",
+    "age": "age",
+    "counselor": "counselor",
+    "birth_place": "birthplace",
+    "birth_verification_doc": "BirthVerifDoc",
+    "birth_verification_doc_num": "BirthVerifDocNum",
+    "marital_status": "MaritalStatus",
+    "migrant_number": "MigrantNum",
+    "hispaic_or_latino": "hispaniclatino",
+    "ethnicity": "ethnicity",
+    "english_proficiency": "englishProf",
+    "primary_language": "primaryLanguage",
+    "home_language": "homeLanguage",
+    "home_address_line_1": "homeaddrline1",
+    "mail_address_line_1": "mailaddrline1",
+    "address_verified": "addrverif",
+    "primary_phone": "primaryphone",
+    "additional_phones": "additionalphones",
+    "email_address":" emailaddr"
   }

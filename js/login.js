@@ -18,7 +18,9 @@ function main() {
   if (api.session != "") {
     api.validate_session(function(r){
       if (r.getResponseHeader("success") == "true") {
-        elements.error_text.innerHTML = "";
+        if (typeof elements.error_text != "undefined") {
+          elements.error_text.innerHTML = "";
+        }
         console.log("Already logged in. Redirecting...")
         window.location.href = "/assignments";
       }

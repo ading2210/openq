@@ -65,6 +65,7 @@ def generate_response(data, session=None, status=200, headers={}, gzip_level=Non
     headers["content-length"] = len(content)
     headers["content-encoding"] = "gzip"
     headers["content-type"] = "application/json"
+    headers["original-length"] = len(content_uncompressed)
   
   response = make_response(content)
   response.status_code = status

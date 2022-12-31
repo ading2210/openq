@@ -1,0 +1,26 @@
+{% extends "info.html" %}
+{% set selected = "attendence_link" %}
+
+{% block title %}Attendence - OpenQ{% endblock %}
+
+{% block head %}
+<script type="module" src="/js/attendance.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="p-3 flex-1 flex flex-col gap-2">
+  <h2 class="text-xl">Attendance</h2>
+  <table id="attendance_summary_table" class="table">
+    <thead class="bg-custom_bg_light w-fit">
+      <tr class="text-left bg-custom_bg_light">
+        <th scope="col" class="table_cell">Period</th>
+        <th scope="col" class="table_cell">Class</th>
+        <th scope="col" class="table_cell">Teacher</th>
+        <th scope="col" class="table_cell">Grade</th>
+      </tr>
+    </thead>
+    <tbody id="attendance_summary_table_body">
+    </tbody>
+  </table>
+</div>
+{% endblock %}
