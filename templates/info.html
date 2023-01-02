@@ -3,24 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}{% endblock %}</title>
+    <title id="title"></title>
     <link rel=icon href="/assets/icons/favicon_32.png" type="image/png">
     <link rel="stylesheet" href="/css/dist.css">
     {% block head %}
     {% endblock %}
     
-    {% if selected %}
-      <script>
-        const selected_page = "{{ selected }}";
-        window.addEventListener("load", function () {
-          let selected_link = document.getElementById(selected_page);
-          if (selected_link != null) {
-            selected_link.className = "sidebar_button_selected"; 
-          }
-        })
-      </script>
-    {% endif %}
+    <script type="module" src="/js/main.js"></script>
+
+    <script>
+      const selected_page = "{{selected}}"
+      const current_module = "{{ module }}";
+    </script>
   </head>
+  
   <body class="h-screen bg-custom_bg_regular text-custom_text">
     <div class="min-h-screen flex flex-col">
       <div class="flex flex-1 items-stretch">
@@ -57,6 +53,8 @@
           </button>
         </div>
         <div class="flex-1 flex flex-col">
+          <div id="main_div" class="p-3 flex-1 flex flex-col gap-2">
+          </div>
           {% block content %}
           {% endblock %}
         </div>

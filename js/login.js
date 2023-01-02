@@ -26,7 +26,6 @@ function main() {
       }
       else {
         console.log("Stored session is not valid.");
-        window.localStorage.clear();
       }
     });
   }

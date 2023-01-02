@@ -1,19 +1,13 @@
+//===== module for displaying the assignments overview =====
+
 import * as info from "/js/modules/info.js";
 import * as api from "/js/modules/api.js";
-import * as utils from "/js/modules/utils.js";
+import * as dom from "/js/modules/dom.js";
 
-export const elements_list = ["grades_summary_table", "grades_summary_table_body"];
-export var elements = {};
+export const elements = {};
 
 export function main() {
-  //set up scripts for the sidebar
-  info.main();
-  
-  window.addEventListener("load", on_load);
-}
-
-export function on_load() {
-  elements = utils.get_elements(elements_list);
+  setup_document();
   
   if (info.students == null) {
     info.set_students_callback(load_assignments);
@@ -23,36 +17,45 @@ export function on_load() {
   }
 }
 
+export function setup_document() {
+  elements.main_div = document.getElementById("main_div");
+  
+  elements.table_title = dom.create_element("h2", {
+    classes: "text-xl",
+    innerHTML: "Assignments Overview:"
+  });
+  elements.main_div.append(elements.table_title);
+  
+  let columns = {
+    period: "Period",
+    course: "Course",
+    teacher: "Teacher",
+    grade: "Grade"
+  };
+  elements.summary_table = dom.Table.import_table(columns);
+  elements.main_div.append(elements.summary_table.table);
+  
+  elements.table_description = dom.create_element("p", {
+    innerHTML: "Click on a row to view detailed information."
+  });
+  elements.main_div.append(elements.table_description);
+}
+
 export function load_assignments() {
   api.get_courses(function(r) {
     if (r.success) {
-      console.log("Loaded courses from API.")
+      console.log("Loaded courses from API.");
       populate_overview(r.json.data);
     }
   });
 }
 
 export function populate_overview(courses) {
-  let tbody = elements.grades_summary_table_body;
-  for (let user_class of courses.courses) {
-    let row = document.createElement("tr");
-    row.className = "table_row";
-    
-    let cell_data = ["period", "course", "teacher", "grade"];
-    for (let cell_key of cell_data) {
-      let cell_text = user_class[cell_key];
-      let cell = document.createElement("td");
-      cell.className = "table_cell";
-      cell.innerHTML = cell_text;
-      row.appendChild(cell);
-    }
-    
-    row.addEventListener("click", function(){
-      window.location.href = `/assignments/${user_class.course_code}`;
-    })
-    
-    tbody.appendChild(row);
+  for (let course of courses.courses) {
+    let row = elements.summary_table.create_row(course);
+    row.element.addEventListener("click", function(){
+      window.location.href = `/assignments/${course.course_code}`;
+    });
+    elements.summary_table.add_row(row);
   }
 }
-
-main();

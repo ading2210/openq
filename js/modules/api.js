@@ -1,3 +1,5 @@
+//===== module for interfacing with openq's api =====
+
 import * as utils from "/js/modules/utils.js";
 
 export var q_endpoint = "";

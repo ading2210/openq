@@ -195,7 +195,7 @@ def about():
 
 @app.route("/assignments")
 def assignments():
-  return render_template("assignments.html")
+  return render_template("info.html", module="assignments", selected="assignments_link")
 
 #not implemented yet
 @app.route("/demographics")

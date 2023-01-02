@@ -1,10 +1,12 @@
+//===== functions for the sidebar and other
+
 import * as api from "/js/modules/api.js"
 import * as utils from "/js/modules/utils.js";
 
 export const elements_list = [
   "selected_student_name", "selected_student_year", "selected_student_img",
   "selected_student", "menu_student_template", "students_menu",
-  "arrows_seperate", "arrows_union", "logout_button"
+  "arrows_seperate", "arrows_union", "logout_button", "title"
 ];
 export var elements = {};
 export var selected_student = null;
@@ -12,12 +14,6 @@ export var students = null;
 export var on_students_load = null;
 
 export function main() {
-  //load q endpoint and session
-  if (api.load_q_endpoint() == null) {
-    api.retrieve_default_endpoint(true);
-  }
-  api.load_session();
-  
   window.addEventListener("load", on_load);
 }
 
@@ -52,7 +48,6 @@ export function load_students() {
     }
     else {
       console.log("Stored session is not valid. Redirecting...");
-      window.localStorage.clear();
       window.location.href = "/";
     }
   });
