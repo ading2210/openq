@@ -1,20 +1,36 @@
-//===== functions for the sidebar and other
+//===== main js files =====
 
-import * as api from "/js/modules/api.js"
+import * as api from "/js/modules/api.js";
 import * as utils from "/js/modules/utils.js";
 
 export const elements_list = [
   "selected_student_name", "selected_student_year", "selected_student_img",
   "selected_student", "menu_student_template", "students_menu",
-  "arrows_seperate", "arrows_union", "logout_button", "title"
+  "arrows_seperate", "arrows_union", "logout_button", "title", "main_div"
 ];
 export var elements = {};
 export var selected_student = null;
 export var students = null;
 export var on_students_load = null;
 
-export function main() {
-  window.addEventListener("load", on_load);
+export const module_paths = {
+  assignments: "/js/pages/assignments.js",
+  attendance: "/js/pages/attendance.js"
+};
+export var modules = {};
+export var current_page = null;
+
+export function main(page) {
+  if (page) {
+    current_page = page;
+  }
+  
+  if (api.load_q_endpoint() == null) {
+    api.retrieve_default_endpoint(true);
+  }
+  api.load_session();
+  
+  window.addEventListener("DOMContentLoaded", on_load);
 }
 
 export function on_load() {
@@ -27,6 +43,46 @@ export function on_load() {
   });
   
   load_students();
+  
+  switch_page(current_page);
+}
+
+export function switch_page(page) {
+  console.log(`Loading page: ${page}`);
+  
+  //load selected module
+  let module_path = module_paths[page];
+  load_module(page, module_path);
+  
+  //highlight link to selected page
+  let old_link = document.getElementById(current_page+"_link");
+  if (old_link != null) {
+    old_link.className = "sidebar_button";
+  }
+  let selected_link = document.getElementById(page+"_link");
+  if (selected_link != null) {
+    selected_link.className = "sidebar_button_selected"; 
+  }
+  
+  current_page = page;
+}
+
+export function load_module(module_name, module_path) {
+  //import and run module
+  import(module_path)
+    .then(function(module) {
+      console.log(`Loaded module: ${module_path}`);
+      utils.clear_element(elements.main_div);
+      modules[module_name] = module;
+      modules[module_name].main();
+    })
+    .catch(function(error) {
+      console.error(error);
+    });
+}
+
+export function set_title(title) {
+  elements.title.innerHTML = title;
 }
 
 export function set_students_callback(callback) {
@@ -36,7 +92,7 @@ export function set_students_callback(callback) {
 export function load_students() {
   api.get_students(function(r){
     if (r.success) {
-      console.log(`Loaded students from API.`)
+      console.log(`Loaded students from API.`);
       students = r.json.data.students;
       display_student(students[0]);
       populate_students_menu(students);

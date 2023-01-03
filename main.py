@@ -66,9 +66,8 @@ def login():
       raise exceptions.BadRequestError("Password cannot be empty.")
     
     result = api.login(auth["endpoint"], data["username"], data["password"], headers=headers)
-    response = {"success": True}
-    return utils.generate_response(response, result.session)
-  
+    return utils.generate_response(result, result.session)
+    
   except Exception as e:
     return utils.handle_exception(e)
 
@@ -195,16 +194,16 @@ def about():
 
 @app.route("/assignments")
 def assignments():
-  return render_template("info.html", module="assignments", selected="assignments_link")
+  return render_template("app.html", page="assignments")
 
 #not implemented yet
 @app.route("/demographics")
 def demographics():
-  return render_template("demographics.html")
+  return render_template("app.html", page="demographics")
 
 @app.route("/attendance")
 def attendance():
-  return render_template("attendance.html")
+  return render_template("app.html", page="attendance")
 
 #===== assets and static files =====
 

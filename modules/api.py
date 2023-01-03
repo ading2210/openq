@@ -321,7 +321,7 @@ def get_attendance(endpoint, session, headers={}):
   #create attendance object
   attributes = {
     "summary_classes": summary_classes,
-    "summary_reason": attendance_reasons,
+    "summary_reason": summary_reason,
     "attendance_items": attendance_items
   }
   attendance = datatypes.Attendance(attributes=attributes)

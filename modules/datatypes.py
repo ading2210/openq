@@ -189,19 +189,15 @@ class DataClass:
     self.attributes_inverted = {}
     for key, value in self.attributes.items():
       self.attributes_inverted[value] = key
-
-    for key in self.attributes:
+      
       if key in attributes:
         setattr(self, key, attributes[key])
       else:
         setattr(self, key, None)
-          
-    if table_data != {}:
-      for key in self.attributes:
-        header_id = self.attributes[key]
-        if header_id in table_data:
-          setattr(self, key, table_data[header_id])
-        
+      
+      if value in table_data:
+        setattr(self, key, table_data[value])
+    
   def encode_as_dict(self):
     student_dict = {}
     for key in self.attributes:

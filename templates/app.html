@@ -3,24 +3,23 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title id="title"></title>
+    <title id="title">OpenQ</title>
     <link rel=icon href="/assets/icons/favicon_32.png" type="image/png">
     <link rel="stylesheet" href="/css/dist.css">
     {% block head %}
     {% endblock %}
     
-    <script type="module" src="/js/main.js"></script>
-
-    <script>
-      const selected_page = "{{selected}}"
-      const current_module = "{{ module }}";
+    <script type="module">
+      import * as app from "/js/app.js";
+      app.main("{{page}}");
     </script>
+
   </head>
   
   <body class="h-screen bg-custom_bg_regular text-custom_text">
-    <div class="min-h-screen flex flex-col">
-      <div class="flex flex-1 items-stretch">
-        <div class="w-64 flex flex-col items-stretch bg-custom_bg_dark border-r border-custom_bg_light gap-2">
+    <div class="h-screen flex flex-col">
+      <div class="flex flex-1 items-stretch h-full">
+        <div class="w-64 flex flex-col items-stretch bg-custom_bg_dark border-r border-custom_bg_light gap-2 overflow-auto">
           <div class="flex flex-col p-4 gap-3">
             <img class="w-36 drop_shadow_fixed_md" src="/assets/title.svg">
             <a id="assignments_link" class="sidebar_button" href="/assignments">Assignments</a>
@@ -52,7 +51,7 @@
             <svg id="arrows_union" class="stroke-custom_text hidden" width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 6L12 9.5 8.5 6M15.5 17.5L12 14l-3.5 3.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
           </button>
         </div>
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col overflow-auto">
           <div id="main_div" class="p-3 flex-1 flex flex-col gap-2">
           </div>
           {% block content %}

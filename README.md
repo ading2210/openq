@@ -8,6 +8,7 @@ Currently, OpenQ is able to:
  - Login
  - List and display students
  - List courses and grades
+ - Display attendance data
 
 Since OpenQ is in early development, the current feature set is very incomplete.
 

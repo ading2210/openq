@@ -104,7 +104,7 @@ input[type="password"] {
     @apply
     ring-1
     ring-custom_bg_alt 
-    w-fit 
+    w-full
     table-auto 
     rounded-lg
     overflow-hidden

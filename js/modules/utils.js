@@ -1,6 +1,6 @@
 //===== misc utils =====
 
-import * as api from "/js/modules/api.js"
+import * as api from "/js/modules/api.js";
 
 export function merge_args(defaults, args) {
   let keys = Object.keys(defaults);
@@ -21,10 +21,16 @@ export function clear_obj(obj) {
   }
 }
 
+export function clear_element(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+}
+
 export function format_string(string) {
   for (let i=1; i<arguments.length; i++) {
     let replacement = arguments[i];
-    string = string.replace(`{${i-1}}`, replacement)
+    string = string.replace(`{${i-1}}`, replacement);
   }
   return string;
 }
