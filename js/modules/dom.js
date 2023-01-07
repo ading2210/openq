@@ -3,7 +3,7 @@
 import * as utils from "/js/modules/utils.js";
 
 
-export function create_element(tag, args) {
+export function create_element(tag, args={}) {
   let defaults = {id: null, classes: null, innerHTML: null};
   args = utils.merge_args(defaults, args);
   
@@ -95,6 +95,11 @@ export class Table {
   add_row(row) {
     this.rows.push(row);
     this.tbody.append(row.element);
+  }
+  
+  clear_table() {
+    utils.clear_element(this.table.tbody);
+    this.rows = [];
   }
   
   static import_table(columns, data=[]) {

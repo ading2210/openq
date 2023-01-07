@@ -28,7 +28,7 @@ export function setup_document() {
       reason: {text: "Reason", classes: "w-full min-w-[12rem]"},
       count: {text: "Count", classes: "text-center min-w-[6rem]"},
     },
-    header: "Attendance Summary By Reason:"
+    header: "Attendance Summary by Reason:"
   });
   
   elements.items_table = dom.Table.add_table(app.elements.main_div, {
@@ -48,6 +48,9 @@ export function load_attendance() {
     if (r.success) {
       console.log("Loaded attendance data from API.");
       populate_tables(r.json.data.attendance);
+    }
+    else {
+      app.handle_error(r);
     }
   });
 }

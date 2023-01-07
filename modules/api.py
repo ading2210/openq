@@ -100,8 +100,14 @@ def get_students(endpoint, session, headers={}):
     
     students.append(datatypes.Student(attributes=attributes, table_data=row.data))
   
+  try: 
+    document.get_element_by_id("noitems")
+    selected = False
+  except KeyError:
+    selected = True
+  
   timer.update_finished()
-  return datatypes.APIResult(students=students, timer=timer)
+  return datatypes.APIResult(students=students, timer=timer, selected=selected)
 
 #set the current student so that other data can be fetched
 def set_current_student(endpoint, session, q_id, headers={}):
@@ -112,6 +118,9 @@ def set_current_student(endpoint, session, q_id, headers={}):
   timer.update_request()
 
   if r.status_code == 302:
+    url2 = endpoint + q_endpoints["main_page"]
+    r2 = requests.get(url2, headers=headers)
+    
     return datatypes.APIResult(success=True, timer=timer)
   else:
     raise exceptions.BadGatewayError(f"Could not set the current student. Endpoint returned status code {r.status_code}.")
@@ -150,6 +159,9 @@ def get_assignments(endpoint, session, headers={}, courses_only=False):
   #parse html
   document = lxml.html.document_fromstring(r.text)
   
+  if document.xpath('//div[@class="appblank"]'):
+    raise exceptions.BadRequestError("Student not selected.")
+
   courses = []
   counter = 0
   while True:
@@ -275,9 +287,12 @@ def get_attendance(endpoint, session, headers={}):
   
   #parse document and tables
   document = lxml.html.document_fromstring(r.text)
-  summary_reason_element = document.get_element_by_id("SP-AttendanceByReason")
-  summary_class_element = document.get_element_by_id("SP-AttendanceByClass")
-  detailed_element = document.get_element_by_id("SP-AttendanceDetail")
+  try:
+    summary_reason_element = document.get_element_by_id("SP-AttendanceByReason")
+    summary_class_element = document.get_element_by_id("SP-AttendanceByClass")
+    detailed_element = document.get_element_by_id("SP-AttendanceDetail")
+  except KeyError:
+    raise exceptions.BadRequestError("Student not selected.")
   
   summary_reason_table = datatypes.Table(summary_reason_element)
   summary_class_table = datatypes.Table(summary_class_element)

@@ -22,8 +22,10 @@ export function clear_obj(obj) {
 }
 
 export function clear_element(element) {
-  while (element.firstChild) {
-    element.removeChild(element.firstChild);
+  if (element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
   }
 }
 
@@ -68,6 +70,8 @@ export function generate_callback(callback) {
     if (typeof this.json.session != "undefined") {
       api.set_session(this.json.session);
     }
+    
+    api.set_server(this.getResponseHeader("server"));
     
     if (typeof callback == "function") {
       callback(this);

@@ -17,7 +17,11 @@ export const api_endpoints = {
   demographics: "/api/demographics",
   attendance: "/api/attendance"
 };
+export var server = "";
 
+export function set_server(s) {
+  server = s;
+}
 export function set_q_endpoint(new_endpoint) {
   q_endpoint = new_endpoint;
 }

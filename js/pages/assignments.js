@@ -2,6 +2,7 @@
 
 import * as app from "/js/app.js";
 import * as api from "/js/modules/api.js";
+import * as utils from "/js/modules/utils.js";
 import * as dom from "/js/modules/dom.js";
 
 export const elements = {};
@@ -10,12 +11,7 @@ export function main() {
   app.set_title("Assignments - OpenQ");
   setup_document();
   
-  if (app.students == null) {
-    app.set_students_callback(load_assignments);
-  }
-  else {
-    load_assignments();
-  }
+  load_assignments();
 }
 
 export function setup_document() {
@@ -37,10 +33,14 @@ export function load_assignments() {
       console.log("Loaded courses from API.");
       populate_overview(r.json.data);
     }
+    else {
+      app.handle_error(r);
+    }
   });
 }
 
 export function populate_overview(courses) {
+  elements.summary_table.clear_table();
   for (let course of courses.courses) {
     let row = elements.summary_table.create_row(course);
     row.element.addEventListener("click", function(){

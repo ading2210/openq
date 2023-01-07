@@ -91,23 +91,7 @@ def validate_session():
       
 @app.route("/api/students")
 def get_students():
-  try:
-    auth, headers = utils.extract_data(request)
-    endpoint = auth["endpoint"]
-    
-    result = api.get_students(endpoint, auth["session"], headers=headers)
-    students = result.students
-    if len(students) == 1:
-      api.set_current_student(endpoint, auth["session"], students[0].id, headers=headers)
-      students[0].active = True
-    else:
-      for student in students:
-        student.active = False
-    
-    return utils.generate_response(result)
-    
-  except Exception as e:
-    return utils.handle_exception(e)
+  return generic_api_route(request, api.get_students)
 
 @app.route("/api/set_student/<student_id>")
 def set_student(student_id):
@@ -186,7 +170,7 @@ def get_attendance():
 
 @app.route("/")
 def homepage():
-  return render_template("index.html")
+  return render_template("login.html")
 
 @app.route("/about")
 def about():
