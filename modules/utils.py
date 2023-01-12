@@ -119,10 +119,10 @@ def validate_headers(request):
 
 #extract headers and auth data from a flask request
 def extract_data(request):
-  auth = validate_headers(request)
+  kwargs = validate_headers(request)
   
-  headers = {}
+  kwargs["headers"] = {}
   if request.headers.get("user-agent"):
-    headers["user-agent"] = request.headers["user-agent"]
+    kwargs["headers"]["user-agent"] = request.headers["user-agent"]
 
-  return auth, headers
+  return kwargs

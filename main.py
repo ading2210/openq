@@ -37,8 +37,8 @@ def hanle_404(e):
 
 def generic_api_route(request, api_method, *args, **kwargs):
   try:
-    auth, headers = utils.extract_data(request)
-    result = api_method(auth["endpoint"], auth["session"], *args, **kwargs)
+    default_kwargs = utils.extract_data(request)
+    result = api_method(*args, **default_kwargs, **kwargs)
     return utils.generate_response(result)
   except Exception as e:
     return utils.handle_exception(e)
@@ -54,7 +54,9 @@ def get_default_endpoint():
 @app.route("/api/login", methods=["POST"])
 def login():
   try:
-    auth, headers = utils.extract_data(request)
+    auth = utils.extract_data(request)
+    headers = auth.pop("headers")
+    
     if "cookie" in headers: del headers["cookie"]
     data = request.json
     
@@ -74,9 +76,9 @@ def login():
 @app.route("/api/validate_session", methods=["GET", "HEAD"])
 def validate_session():
   try:
-    auth, headers = utils.extract_data(request)
+    kwargs = utils.extract_data(request)
     endpoint = auth["endpoint"]
-    api.get_students(endpoint, auth["session"], headers=headers)
+    api.get_students(**kwargs, headers=headers)
     
     if request.method == "GET":
       return utils.generate_response({"success": True})
@@ -91,7 +93,14 @@ def validate_session():
       
 @app.route("/api/students")
 def get_students():
-  return generic_api_route(request, api.get_students)
+  try:
+    default_kwargs = utils.extract_data(request)
+    result = api.get_students(**default_kwargs)
+    if not result.selected:
+      api.set_current_student(**default_kwargs, q_id=result.students[0].id)
+    return utils.generate_response(result)
+  except Exception as e:
+    return utils.handle_exception(e)
 
 @app.route("/api/set_student/<student_id>")
 def set_student(student_id):
@@ -101,12 +110,10 @@ def set_student(student_id):
 @app.route("/api/student_image/<student_id>")
 def get_student_image(student_id=None):
   try:
-    auth, headers = utils.extract_data(request)
-    endpoint = auth["endpoint"]
-    session = auth["session"]
-    
+    default_kwargs = utils.extract_data(request)
+
     #todo: don't use base64
-    result = api.get_student_image(endpoint, session, student_id, headers=headers)
+    result = api.get_student_image(**default_kwargs, student_id=student_id)
     
     #resize and compress image if applicable
     resized_size = request.args.get("size")
@@ -130,6 +137,8 @@ def get_student_image(student_id=None):
       img_bytes = io.BytesIO()
       image_stripped.save(img_bytes, format="jpeg", optimize=True, quality=85)
       data = img_bytes.getvalue()
+      
+      result.content_type = "image/jpg"
     else:
       data = result.data
     

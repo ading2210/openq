@@ -73,7 +73,7 @@ def login(endpoint, username, password, headers={}):
     raise exceptions.ForbiddenError("Username/Password is invalid.")
 
 #get list of students in account
-def get_students(endpoint, session, headers={}):
+def get_students(endpoint="", session="", headers={}):
   url = endpoint + q_endpoints["main_page"]
   headers["cookie"] = construct_cookie(session)
   timer = datatypes.RequestTimer()
@@ -110,7 +110,7 @@ def get_students(endpoint, session, headers={}):
   return datatypes.APIResult(students=students, timer=timer, selected=selected)
 
 #set the current student so that other data can be fetched
-def set_current_student(endpoint, session, q_id, headers={}):
+def set_current_student(q_id, endpoint="", session="", headers={}):
   url = endpoint + q_endpoints["set_student"].format(q_id=q_id)
   headers["cookie"] = construct_cookie(session)
   timer = datatypes.RequestTimer()
@@ -126,7 +126,7 @@ def set_current_student(endpoint, session, q_id, headers={}):
     raise exceptions.BadGatewayError(f"Could not set the current student. Endpoint returned status code {r.status_code}.")
 
 #get a student's image
-def get_student_image(endpoint, session, student_id=None, headers={}):
+def get_student_image(student_id=None, endpoint="", session="", headers={}):
   if student_id:
     url = endpoint + q_endpoints["student_image"].format(student_id=student_id)
   else:
@@ -145,7 +145,7 @@ def get_student_image(endpoint, session, student_id=None, headers={}):
     raise exceptions.BadGatewayError("Could not get the student image.")
 
 #get all assignments
-def get_assignments(endpoint, session, headers={}, courses_only=False):
+def get_assignments(headers={}, endpoint="", session="", courses_only=False):
   url = endpoint + q_endpoints["assignments"]
   headers["cookie"] = construct_cookie(session)
   
@@ -210,6 +210,8 @@ def get_assignments(endpoint, session, headers={}, courses_only=False):
     
     grade_regex = r'<label for="grade" id="lblgrade">Grade</label>: </b>(.*?)[\s|<>]'
     grade = run_regex(grade_regex)
+    if grade == "Not":
+      grade = "Not Available"
     
     progress_regex = r'<a href="JavaScript:OpenProgress\((\d+)\);" id="lnk\d+" title="Student Progress Report" style="color:#FFFFFF;">'
     progress_reports_id = run_regex(progress_regex)
@@ -241,7 +243,7 @@ def get_assignments(endpoint, session, headers={}, courses_only=False):
   return datatypes.APIResult(courses=courses, timer=timer)
 
 #get student demographics
-def get_demographics(endpoint, session, headers={}):
+def get_demographics(endpoint="", session="", headers={}):
   url = endpoint + q_endpoints["demographics"]
   headers["cookie"] = construct_cookie(session)
   
@@ -275,10 +277,11 @@ def get_demographics(endpoint, session, headers={}):
   demographics = datatypes.Demographics(table_data=table_data)
   
   timer.update_finished()
-  return datatypes.APIResult(demographics=demographics, timer=timer)
+  order = list(demographics.attributes.keys())
+  return datatypes.APIResult(demographics=demographics, timer=timer, order=order)
   
 #get student attendance data
-def get_attendance(endpoint, session, headers={}):
+def get_attendance(endpoint="", session="", headers={}):
   url = endpoint + q_endpoints["attendance"]
   headers["cookie"] = construct_cookie(session)
   timer = datatypes.RequestTimer()

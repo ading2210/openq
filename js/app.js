@@ -89,6 +89,13 @@ export function display_error(title, body, traceback=null, r=null) {
     innerHTML: body
   });
   elements.main_div.append(error_title, error_text);
+  
+  if (r) {
+    let endpoint_text = dom.create_element("p", {
+      innerHTML: `Endpoint: ${r.responseURL}`
+    });
+    elements.main_div.append(endpoint_text);
+  }
 
   if (traceback) {
     let traceback_header = dom.create_element("p", {
@@ -104,6 +111,7 @@ export function display_error(title, body, traceback=null, r=null) {
   let server_text = dom.create_element("p", {
     innerHTML: `Server: ${api.server}`
   });
+  
   elements.main_div.append(server_text);
 }
 
@@ -113,7 +121,7 @@ export function handle_error(r) {
   let title = `HTTP Error ${r.status}: ${error.error}`;
   let body = `Message: ${error.message}`;
 
-  display_error(title, body, error.traceback);
+  display_error(title, body, error.traceback, r);
 }
 
 //set the page title
@@ -139,7 +147,7 @@ export function load_students() {
     }
     else {
       console.log("Stored session is not valid. Redirecting...");
-      window.location.href = "/";
+      //window.location.href = "/";
     }
   });
 }
@@ -151,11 +159,11 @@ export function select_student(id) {
     if (student.id == id) {
       selected_student = student;
       display_student(student);
+      switch_page(current_page);
       break;
     }
   }
   toggle_students_menu();
-  switch_page(current_page);
 }
 
 //populate the students menu
