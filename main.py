@@ -6,6 +6,7 @@ import pathlib
 import base64
 import time
 import io
+import os
 
 #===== load config =====
 base_path = pathlib.Path(__file__).parent.resolve()
@@ -215,6 +216,12 @@ def css(path):
 #===== start server =====
 
 if __name__ == "__main__":
+  #regenerate tailwind dist.css file
+  print("Regenerating tailwind css file...")
+  base_path = os.path.dirname(os.path.abspath(__file__))
+  cmd = f"tailwindcss -i {base_path}/css/main.css -o {base_path}/css/dist.css -m"
+  os.system(cmd)
+  
   host = utils.config["server_address"]
   port = utils.config["server_port"]
   debug = utils.config["debug"]

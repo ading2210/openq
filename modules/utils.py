@@ -22,7 +22,7 @@ def load_config(config_path):
   with open(defaults_file) as f:
     defaults = json.loads(f.read())
   
-  if defaults_file.exists():
+  if defaults_file.exists() and config_file.exists():
     try:
       with open(config_file) as f:
         config = json.loads(f.read())

@@ -9,6 +9,7 @@ Currently, OpenQ is able to:
  - List and display students
  - List courses and grades
  - Display attendance data
+ - Display demographic data
 
 Since OpenQ is in early development, the current feature set is very incomplete.
 
@@ -18,9 +19,8 @@ To run this project for yourself, follow these steps:
 1. Clone this repository.
 2. Install the needed dependancies by running `pip3 install -r requirements.txt`.
 3. Copy `config/defaults.json` to `config/config.json` and modify the options to your liking. Make sure to set the `"endpoint"`option to the url of your Q instance's login screen.
-4. Run `tailwindcss -i ./css/main.css -o ./css/dist.css -m` to generate the site's CSS.
-5. Run `python3 main.py` to start the server.
-6. Alternatively, install GNU Screen on your system and run `bash scripts/start.sh`. You can then use `screen -dr webserver` to view the server log.
+4. Run `python3 main.py` to start the server.
+5. Alternatively, install GNU Screen on your system and run `bash scripts/start.sh`. You can then use `screen -dr webserver` to view the server log.
 
 ## Configuration Options:
 
