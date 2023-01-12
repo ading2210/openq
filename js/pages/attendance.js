@@ -61,7 +61,9 @@ export function populate_tables(attendance) {
     field_trip: "Field Trip",
     sick: "Illness or Sickness",
     absent: "Unexcused Absence",
-    tardy: "Unexcuesed Tardy"
+    tardy: "Unexcuesed Tardy",
+    medical: "Medical",
+    school_pass: "School Pass",
   };
   
   for (let course of attendance.summary_classes) {
