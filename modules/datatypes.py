@@ -269,7 +269,9 @@ class AttendanceReasons(DataClass):
     "absent": "Absent",
     "sick": "Illness or Sickness Only",
     "field_trip": "Field Trip",
-    "tardy": "Unex Tardy Less than 30 min"
+    "tardy": "Unex Tardy Less than 30 min",
+    "school_pass": "School Pass",
+    "medical": "Medical/Dent Full Per/Day",
   }
 
 class AttendanceItem(DataClass):
